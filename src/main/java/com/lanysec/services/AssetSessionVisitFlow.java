@@ -95,12 +95,13 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
         });
 
         // 添加需要匹配的字段
-        // DataStream<String> matchAssetSourceStream = kafkaSourceFilter.map(new AssetMapSourceFunction()).filter((FilterFunction<String>) value -> !StringUtil.isEmpty(value));
+        DataStream<String> matchAssetSourceStream = kafkaSourceFilter.map(new AssetMapSourceFunction())
+                .filter((FilterFunction<String>) value -> !StringUtil.isEmpty(value));
 
         //建模系列操作
         {
             //建模entity
-            DataStream<FlowEntity> kafkaProcessStream = kafkaSourceFilter.process(new ParserKafkaProcessFunction())
+            DataStream<FlowEntity> kafkaProcessStream = matchAssetSourceStream.process(new ParserKafkaProcessFunction())
                     // TODO 添加水位线 必须加否则无法group by
                     .assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
 

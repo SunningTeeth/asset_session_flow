@@ -17,9 +17,9 @@ import java.sql.SQLException;
 public class DbConnectUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(DbConnectUtil.class);
-    private static BasicDataSource dataSource = new BasicDataSource();
 
-    static {
+    public static Connection getConnection() {
+        BasicDataSource dataSource = new BasicDataSource();
         String addr = SystemUtil.getHostIp();
         String username = SystemUtil.getMysqlUser();
         String password = SystemUtil.getMysqlPassword();
@@ -28,6 +28,7 @@ public class DbConnectUtil {
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
+
         //初始化的连接数
         dataSource.setInitialSize(3);
         //最大连接数
@@ -36,14 +37,12 @@ public class DbConnectUtil {
         dataSource.setMaxIdle(2);
         //最小空闲数
         dataSource.setMinIdle(1);
-    }
 
-    public static Connection getConnection() {
         Connection con = null;
         try {
             con = dataSource.getConnection();
         } catch (Exception e) {
-            logger.error("create mysql connect pool failed.",e);
+            logger.error("create mysql connect pool failed", e);
         }
         return con;
     }
