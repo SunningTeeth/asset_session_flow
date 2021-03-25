@@ -10,6 +10,7 @@ import com.lanysec.utils.ConversionUtil;
 import com.lanysec.utils.DbConnectUtil;
 import com.lanysec.utils.StringUtil;
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -122,10 +123,10 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
             });
 
             // TODO 添加水位线 必须加否则无法group by
-            // 上行流量
+            //下行流量
             SingleOutputStreamOperator<FlowEntity> inFlowProcessStream = flowProcessSplitStream.assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
 
-            //下行流量
+            // 上行流量
             SingleOutputStreamOperator<FlowEntity> outFlowProcessStream = flowProcessSplitStream.getSideOutput(outputTag).assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
 
             // 注册kafka关联表
@@ -139,15 +140,16 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
             // 运行sql
             //String intervalTime = "'1' DAY";
             String intervalTime = "'1' MINUTE";
-            String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,inFlow as flowSize,count(1) as totalCount," +
+            // 第一个算子计算样本总量(求样本均值)
+            String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(inFlow) as flowSize,count(1) as totalCount," +
                     "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                     "from kafka_asset_in_flow " +
-                    "group by areaId,srcId,srcIp,l4p,inFlow,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
+                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
 
-            String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,outFlow as flowSize,count(1) as totalCount," +
+            String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(outFlow) as flowSize,count(1) as totalCount," +
                     "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                     "from kafka_asset_out_flow " +
-                    "group by areaId,srcId,srcIp,l4p,outFlow,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
+                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
 
             // 获取结果
             Table inFlowTable = streamTableEnvironment.sqlQuery(inFlowSql);
@@ -161,38 +163,46 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
             streamTableEnvironment.createTemporaryView("calculate_in_flow", inFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
             streamTableEnvironment.createTemporaryView("calculate_out_flow", outFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
 
-            String inFlowCalculate = "select srcId,srcIp,areaId,protocol,count(1) as totalCnt," +
+            // 第二个算子计算样本方差
+            String inFlowCalculate = "select srcId,srcIp,areaId,protocol," +
                     "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '5' MINUTE),'YYYY-MM-dd','+08:00') as cDate," +
-                    "sum(flowSize) as sumCount," +
-                    "(sum(flowSize)/count(1)) as avgFlowSize," +
-                    "STDDEV_POP(flowSize) as standPop," +
-                    "((sum(flowSize)/count(1))+1.96*STDDEV_POP(flowSize)/SQRT(count(1))) as maxFlowSize," +
-                    "((sum(flowSize)/count(1))-1.96*STDDEV_POP(flowSize)/SQRT(count(1))) as minFlowSize " +
+                    "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
+                    "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
                     " from calculate_in_flow " +
                     " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL '5' MINUTE)";
 
-            String outFlowCalculate = "select srcId,srcIp,areaId,protocol,count(1) as totalCnt," +
+            String outFlowCalculate = "select srcId,srcIp,areaId,protocol," +
                     "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '5' MINUTE),'YYYY-MM-dd','+08:00') as cDate," +
-                    "sum(flowSize) as sumCount," +
-                    "(sum(flowSize)/count(1)) as avgFlowSize," +
-                    "STDDEV_POP(flowSize) as standPop," +
-                    "((sum(flowSize)/count(1))+1.96*STDDEV_POP(flowSize)/SQRT(count(1))) as maxFlowSize," +
-                    "((sum(flowSize)/count(1))-1.96*STDDEV_POP(flowSize)/SQRT(count(1))) as minFlowSize " +
+                    "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
+                    "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
                     " from calculate_in_flow " +
                     " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL '5' MINUTE)";
 
             Table inFlowCalculateTable = streamTableEnvironment.sqlQuery(inFlowCalculate);
             Table outFlowCalculateTable = streamTableEnvironment.sqlQuery(outFlowCalculate);
 
-            DataStream<FlowStaticEntity> inFlowStaticStream = streamTableEnvironment.toAppendStream(inFlowCalculateTable, FlowStaticEntity.class);
-            DataStream<FlowStaticEntity> outFlowStaticStream = streamTableEnvironment.toAppendStream(outFlowCalculateTable, FlowStaticEntity.class);
+            DataStream<JSONObject> inFlowStaticStream = streamTableEnvironment.toAppendStream(inFlowCalculateTable, FlowStaticEntity.class)
+                    .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
+                        JSONObject json = value.toJSONObject();
+                        //0 下行流量 in ;1 上行流量 out'
+                        json.put("flowType", 0);
+                        return json;
+                    });
+
+            DataStream<JSONObject> outFlowStaticStream = streamTableEnvironment.toAppendStream(outFlowCalculateTable, FlowStaticEntity.class)
+                    .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
+                        JSONObject json = value.toJSONObject();
+                        //0 下行流量 in ;1 上行流量 out'
+                        json.put("flowType", 1);
+                        return json;
+                    });
 
             inFlowStaticStream.print().setParallelism(1);
-            outFlowStaticStream.print().setParallelism(1);
+            //outFlowStaticStream.print().setParallelism(1);
 
             // sink
-            //inFlowSinkEntityDataStream.addSink(new SessionFlowSink());
-            //outFlowSinkEntityDataStream.addSink(new SessionFlowSink());
+            //inFlowStaticStream.addSink(new SessionFlowSink());
+            //outFlowStaticStream.addSink(new SessionFlowSink());
 
         }
 

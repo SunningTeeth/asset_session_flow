@@ -54,11 +54,10 @@ public class ModelParamsConfigurer implements AssetBehaviorConstants {
         Connection connection = DbConnectUtil.getConnection();
         Map<String, Object> result = new HashMap<>(15 * 3 / 4);
         try {
-            //TODO model_type | model_child_type实际需要修改为 对应值 ,这里只是测试
             String sql = "select * from modeling_params" +
                     " where model_type=1 and model_child_type =1" +
-                    " and model_switch = 1 and model_switch_2 =1" +
-                    " and modify_time < DATE_SUB( NOW(), INTERVAL 10 MINUTE );";
+                    " and model_switch = 1 and model_switch_2 =1";
+            //+" and modify_time < DATE_SUB( NOW(), INTERVAL 10 MINUTE );";
             ResultSet resultSet = connection.createStatement().executeQuery(sql);
             while (resultSet.next()) {
                 result.put(MODEL_ID, resultSet.getString("id"));

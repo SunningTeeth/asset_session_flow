@@ -1,6 +1,8 @@
 
 package com.lanysec.entity;
 
+import org.json.simple.JSONObject;
+
 /**
  * @author daijb
  * @date 2021/3/25 11:29
@@ -15,10 +17,6 @@ public class FlowStaticEntity {
     private Integer areaId;
     private String protocol;
     private String cDate;
-    private Long totalCnt;
-    private Long sumCount;
-    private Long avgFlowSize;
-    private Long standPop;
     private Double minFlowSize;
     private Double maxFlowSize;
 
@@ -62,38 +60,6 @@ public class FlowStaticEntity {
         this.cDate = cDate;
     }
 
-    public Long getTotalCnt() {
-        return totalCnt;
-    }
-
-    public void setTotalCnt(Long totalCnt) {
-        this.totalCnt = totalCnt;
-    }
-
-    public Long getSumCount() {
-        return sumCount;
-    }
-
-    public void setSumCount(Long sumCount) {
-        this.sumCount = sumCount;
-    }
-
-    public Long getAvgFlowSize() {
-        return avgFlowSize;
-    }
-
-    public void setAvgFlowSize(Long avgFlowSize) {
-        this.avgFlowSize = avgFlowSize;
-    }
-
-    public Long getStandPop() {
-        return standPop;
-    }
-
-    public void setStandPop(Long standPop) {
-        this.standPop = standPop;
-    }
-
     public Double getMinFlowSize() {
         return minFlowSize;
     }
@@ -110,6 +76,17 @@ public class FlowStaticEntity {
         this.maxFlowSize = maxFlowSize;
     }
 
+    public JSONObject toJSONObject() {
+        JSONObject json = new JSONObject();
+        json.put("srcId", getSrcId());
+        json.put("srcIp", getSrcIp());
+        json.put("areaId", getAreaId());
+        json.put("protocol", getProtocol());
+        json.put("minFlowSize", getMinFlowSize());
+        json.put("maxFlowSize", getMaxFlowSize());
+        return json;
+    }
+
     @Override
     public String toString() {
         return "FlowStaticEntity{" +
@@ -118,10 +95,6 @@ public class FlowStaticEntity {
                 ", areaId=" + areaId +
                 ", protocol='" + protocol + '\'' +
                 ", cDate='" + cDate + '\'' +
-                ", totalCnt=" + totalCnt +
-                ", sumCount=" + sumCount +
-                ", avgFlowSize=" + avgFlowSize +
-                ", standPop=" + standPop +
                 ", minFlowSize=" + minFlowSize +
                 ", maxFlowSize=" + maxFlowSize +
                 '}';

@@ -30,6 +30,25 @@ public class ConversionUtil {
         return Integer.parseInt(str.trim());
     }
 
+    public static int toInt(Object obj) {
+        return toInt(obj, false);
+    }
+
+    public static int toInt(Object obj, boolean catchException) {
+        int result = 0;
+        try {
+            Integer r0 = toInteger(obj);
+            if (r0 != null) {
+                result = r0;
+            }
+        } catch (Throwable t) {
+            if (!catchException) {
+                throw new RuntimeException(t);
+            }
+        }
+        return result;
+    }
+
     public static boolean toBoolean(Object obj) {
         return toBoolean(obj, false);
     }

@@ -1,7 +1,6 @@
 package com.lanysec.services;
 
 import com.lanysec.config.ModelParamsConfigurer;
-import com.lanysec.entity.FlowParserEntity;
 import com.lanysec.utils.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.flink.configuration.Configuration;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * PRIMARY KEY (`id`) USING BTREE
  * ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
  */
-public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
+public class SessionFlowSink extends RichSinkFunction<JSONObject> {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionFlowSink.class);
 
@@ -48,8 +48,6 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
     private volatile ServiceState state = ServiceState.Starting;
 
     private volatile boolean isFirst = true;
-
-    private final int maxBatchSize = 200;
 
     private final AtomicInteger batchSize = new AtomicInteger();
 
@@ -79,7 +77,7 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
     }
 
     @Override
-    public void invoke(FlowParserEntity sinkEntity, Context context) throws Exception {
+    public void invoke(JSONObject value, Context context) throws Exception {
         logger.info("--冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭");
         checkModelInfo();
         checkState();
@@ -94,65 +92,46 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
         }
 
         String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
-        List<Map<String, JSONArray>> lastBuildModelResult = ModelParamsConfigurer.getLastBuildModelResult();
+        List<Map<String, JSONArray>> lastBuildModelResult = queryLastBuildModelResult();
         String key = ConversionUtil.toString(calculateSegmentCurrKey());
-        String entityId = ConversionUtil.toString(sinkEntity.getSrcId());
-        JSONArray flowArr = new JSONArray();
-        for (Map<String, JSONArray> v : lastBuildModelResult) {
-            for (Map.Entry<String, JSONArray> entry : v.entrySet()) {
-                if (!StringUtil.equals(entityId, entry.getKey())) {
-                    continue;
-                }
-                JSONArray flowArrTemp = entry.getValue();
-                JSONArray temp = new JSONArray();
-                for (Object obj : flowArrTemp) {
-                    // {"name": "1","value": "0-9"}
-                    JSONObject item = (JSONObject) JSONValue.parse(obj.toString());
-                    if (!StringUtil.equals(key, ConversionUtil.toString(item.get("name")))) {
-                        continue;
-                    }
-                    String value = ConversionUtil.toString(item.get("value"));
-                    item.put("value", sinkEntity.getFlowSize());
-
-                    temp.add(item);
-                }
-                flowArr = temp;
+        String entityId = ConversionUtil.toString(value.get("srcId"));
+        JSONArray segment = null;
+        for (Map<String, JSONArray> item : lastBuildModelResult) {
+            if (item.get(entityId) != null) {
+                segment = item.get(entityId);
+                break;
             }
         }
-
-        //上行流量
-        {
-            ps.setString(1, "msf_" + UUIDUtil.genId());
-            ps.setString(2, modelId);
-            ps.setString(3, sinkEntity.getSrcId());
-            ps.setString(4, sinkEntity.getSrcIp());
-            ps.setString(5, sinkEntity.getProtocol());
-            ps.setString(6, "[{\"name\": \"1\", \"value\": \"0-9\"}");
-            //0 下行流量 in ;1 上行流量 out'
-            ps.setInt(7, 1);
-            ps.setInt(8, SystemUtil.isInternalIp(sinkEntity.getSrcIp()));
-            ps.setString(9, LocalDateTime.now().toString());
-            ps.addBatch();
-            batchSize.incrementAndGet();
+        JSONObject json = new JSONObject();
+        String calculateValue = value.get("minFlowSize") + "-" + value.get("maxFlowSize");
+        json.put("name", key);
+        json.put("value", calculateValue);
+        if (segment != null) {
+            for (Object o : segment) {
+                JSONObject obj = (JSONObject) o;
+                String name = ConversionUtil.toString(obj.get("name"));
+                if (StringUtil.equals(name, key)) {
+                    obj.put("value", calculateValue);
+                    break;
+                }
+            }
+        } else {
+            segment = new JSONArray();
+            segment.add(json);
         }
-
-        // 下行流量
-        {
-            ps.setString(1, "msf_" + UUIDUtil.genId());
-            ps.setString(2, modelId);
-            ps.setString(3, sinkEntity.getSrcIp());
-            ps.setString(4, sinkEntity.getSrcIp());
-            ps.setString(5, sinkEntity.getProtocol());
-            ps.setString(6, "[{\"name\": \"1\", \"value\": \"1-4\"}");
-            //0 下行流量 in ;1 上行流量 out'
-            ps.setInt(7, 0);
-            ps.setInt(8, 1);
-            ps.setString(9, LocalDateTime.now().toString());
-            ps.addBatch();
-            batchSize.incrementAndGet();
-        }
-
-        if (batchSize.get() > maxBatchSize) {
+        ps.setString(1, "msf_" + UUIDUtil.genId());
+        ps.setString(2, modelId);
+        ps.setString(3, ConversionUtil.toString(value.get("srcId")));
+        ps.setString(4, ConversionUtil.toString(value.get("srcIp")));
+        ps.setString(5, ConversionUtil.toString(value.get("protocol")));
+        ps.setString(6, segment.toJSONString());
+        //0 下行流量 in ;1 上行流量 out'
+        ps.setInt(7, ConversionUtil.toInt(value.get("flowType")));
+        ps.setInt(8, SystemUtil.isInternalIp(ConversionUtil.toString(value.get("srcIp"))));
+        ps.setString(9, LocalDateTime.now().toString());
+        ps.addBatch();
+        batchSize.incrementAndGet();
+        if (batchSize.get() > 200) {
             ps.executeBatch();
             logger.info("插入了" + batchSize.get() + "条数据.");
             batchSize.set(0);
@@ -180,6 +159,30 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
         if (ps != null) {
             ps.close();
         }
+    }
+
+    /**
+     * 查询上次建模结果
+     */
+    public List<Map<String, JSONArray>> queryLastBuildModelResult() {
+        List<Map<String, JSONArray>> result = new ArrayList<>();
+        String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
+        String querySql = "select src_id,flow from model_result_asset_session_flow " +
+                "where modeling_params_id='" + modelId + "';";
+        try {
+            ResultSet resultSet = DbConnectUtil.getConnection().createStatement().executeQuery(querySql);
+            while (resultSet.next()) {
+                Map<String, JSONArray> map = new HashMap<>();
+                String srcId = resultSet.getString("src_id");
+                String segmentStr = resultSet.getString("flow");
+                JSONArray segmentArr = (JSONArray) JSONValue.parse(segmentStr);
+                map.put(srcId, segmentArr);
+                result.add(map);
+            }
+        } catch (SQLException sqlException) {
+            logger.error("query build `session_flow` model result failed", sqlException);
+        }
+        return result;
     }
 
     private static Connection getConnection(BasicDataSource dataSource) {

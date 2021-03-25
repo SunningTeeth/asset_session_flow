@@ -17,10 +17,6 @@ public class FlowEntity {
     private long inFlow;
     private long rTime;
     private Integer areaId;
-    /**
-     * 内网0 外网1
-     */
-    private int internalIp;
 
     public FlowEntity() {
     }
@@ -89,14 +85,6 @@ public class FlowEntity {
         this.areaId = areaId;
     }
 
-    public int getInternalIp() {
-        return internalIp;
-    }
-
-    public void setInternalIp(int internalIp) {
-        this.internalIp = internalIp;
-    }
-
     @Override
     public String toString() {
         return "FlowEntity{" +
@@ -108,7 +96,6 @@ public class FlowEntity {
                 ", inFlow=" + inFlow +
                 ", rTime=" + rTime +
                 ", areaId=" + areaId +
-                ", internalIp=" + internalIp +
                 '}';
     }
 }
