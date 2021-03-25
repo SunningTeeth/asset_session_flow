@@ -11,11 +11,18 @@ public class FlowParserEntity {
     private String protocol;
     private Integer areaId;
     private String cntDate;
-    private long inFlow;
-    private long outFlow;
+    private long flowSize;
     private long totalCount;
 
     public FlowParserEntity() {
+    }
+
+    public String getSrcId() {
+        return srcId;
+    }
+
+    public void setSrcId(String srcId) {
+        this.srcId = srcId;
     }
 
     public String getSrcIp() {
@@ -50,20 +57,12 @@ public class FlowParserEntity {
         this.cntDate = cntDate;
     }
 
-    public long getInFlow() {
-        return inFlow;
+    public long getFlowSize() {
+        return flowSize;
     }
 
-    public void setInFlow(long inFlow) {
-        this.inFlow = inFlow;
-    }
-
-    public long getOutFlow() {
-        return outFlow;
-    }
-
-    public void setOutFlow(long outFlow) {
-        this.outFlow = outFlow;
+    public void setFlowSize(long flowSize) {
+        this.flowSize = flowSize;
     }
 
     public long getTotalCount() {
@@ -74,14 +73,6 @@ public class FlowParserEntity {
         this.totalCount = totalCount;
     }
 
-    public String getSrcId() {
-        return srcId;
-    }
-
-    public void setSrcId(String srcId) {
-        this.srcId = srcId;
-    }
-
     @Override
     public String toString() {
         return "FlowParserEntity{" +
@@ -90,8 +81,7 @@ public class FlowParserEntity {
                 ", protocol='" + protocol + '\'' +
                 ", areaId=" + areaId +
                 ", cntDate='" + cntDate + '\'' +
-                ", inFlow=" + inFlow +
-                ", outFlow=" + outFlow +
+                ", flowSize=" + flowSize +
                 ", totalCount=" + totalCount +
                 '}';
     }

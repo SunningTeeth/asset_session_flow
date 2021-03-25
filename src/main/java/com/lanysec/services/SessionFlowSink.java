@@ -81,7 +81,7 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
     @Override
     public void invoke(FlowParserEntity sinkEntity, Context context) throws Exception {
         logger.info("--冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭冲鸭");
-        /*checkModelInfo();
+        checkModelInfo();
         checkState();
         if (state != ServiceState.Ready) {
             logger.warn("build modeling is stopped...");
@@ -91,10 +91,10 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
         if (!isFirst && !canSink()) {
             logger.warn("more than save data days");
             return;
-        }*/
+        }
 
         String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
-       /* List<Map<String, JSONArray>> lastBuildModelResult = ModelParamsConfigurer.getLastBuildModelResult();
+        List<Map<String, JSONArray>> lastBuildModelResult = ModelParamsConfigurer.getLastBuildModelResult();
         String key = ConversionUtil.toString(calculateSegmentCurrKey());
         String entityId = ConversionUtil.toString(sinkEntity.getSrcId());
         JSONArray flowArr = new JSONArray();
@@ -112,13 +112,13 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
                         continue;
                     }
                     String value = ConversionUtil.toString(item.get("value"));
-                    item.put("value", sinkEntity.getInFlow());
+                    item.put("value", sinkEntity.getFlowSize());
 
                     temp.add(item);
                 }
                 flowArr = temp;
             }
-        }*/
+        }
 
         //上行流量
         {
@@ -255,13 +255,6 @@ public class SessionFlowSink extends RichSinkFunction<FlowParserEntity> {
             }
         }
         return segmentKey;
-    }
-
-    private String getAssetOfIp(String assetIp) {
-        //  {"00:00:00:00:00:00":["192.168.8.97"]}
-        int start = assetIp.indexOf("[") + 2;
-        int end = assetIp.indexOf("]") - 1;
-        return assetIp.substring(start, end);
     }
 
     /**
