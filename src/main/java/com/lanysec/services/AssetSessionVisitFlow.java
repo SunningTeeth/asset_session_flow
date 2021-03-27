@@ -124,124 +124,104 @@ public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
                 .filter((FilterFunction<String>) value -> !StringUtil.isEmpty(value));
 
         //建模系列操作
-        {
-            //定义一个tag,来收集
-            OutputTag<FlowEntity> outputTag = new OutputTag<>("side-output", TypeInformation.of(FlowEntity.class));
-            //建模entity
-            DataStream<FlowEntity> kafkaProcessStream = matchAssetSourceStream.process(new ParserKafkaProcessFunction());
-            // 分流
-            SingleOutputStreamOperator<FlowEntity> flowProcessSplitStream = kafkaProcessStream.process(new ProcessFunction<FlowEntity, FlowEntity>() {
-                @Override
-                public void processElement(FlowEntity value, Context ctx, Collector<FlowEntity> out) throws Exception {
-                    //这句代码的含义是把数据发送到常规的流中，也就是mainDataStream中去，发送的数据是全量的数据
-                    //如果不需要全量的数据，可以不进行发送，那么mainDataStream中也就没有数据
-                    //上行流量
-                    out.collect(value);
-                    //输出到旁路流 下行流量
-                    ctx.output(outputTag, value);
-                }
-            });
 
-            // TODO 添加水位线 必须加否则无法group by
-            //下行流量
-            SingleOutputStreamOperator<FlowEntity> inFlowProcessStream = flowProcessSplitStream.assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
+        //定义一个tag,来收集
+        OutputTag<FlowEntity> outputTag = new OutputTag<>("side-output", TypeInformation.of(FlowEntity.class));
+        //建模entity
+        DataStream<FlowEntity> kafkaProcessStream = matchAssetSourceStream.process(new ParserKafkaProcessFunction());
+        // 分流
+        SingleOutputStreamOperator<FlowEntity> flowProcessSplitStream = kafkaProcessStream.process(new ProcessFunction<FlowEntity, FlowEntity>() {
+            @Override
+            public void processElement(FlowEntity value, Context ctx, Collector<FlowEntity> out) throws Exception {
+                //这句代码的含义是把数据发送到常规的流中，也就是mainDataStream中去，发送的数据是全量的数据
+                //如果不需要全量的数据，可以不进行发送，那么mainDataStream中也就没有数据
+                //上行流量
+                out.collect(value);
+                //输出到旁路流 下行流量
+                ctx.output(outputTag, value);
+            }
+        });
 
-            // 上行流量
-            SingleOutputStreamOperator<FlowEntity> outFlowProcessStream = flowProcessSplitStream.getSideOutput(outputTag).assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
+        // TODO 添加水位线 必须加否则无法group by
+        //下行流量
+        SingleOutputStreamOperator<FlowEntity> inFlowProcessStream = flowProcessSplitStream.assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
 
-            // 注册kafka关联表
-            streamTableEnvironment.createTemporaryView("kafka_asset_in_flow", inFlowProcessStream, "srcId,srcIp,srcPort,areaId,l4p,inFlow,rowtime.rowtime");
-            streamTableEnvironment.createTemporaryView("kafka_asset_out_flow", outFlowProcessStream, "srcId,srcIp,srcPort,areaId,l4p,outFlow,rowtime.rowtime");
+        // 上行流量
+        SingleOutputStreamOperator<FlowEntity> outFlowProcessStream = flowProcessSplitStream.getSideOutput(outputTag).assignTimestampsAndWatermarks(new BrowseBoundedOutOfOrderTimestampExtractor(Time.seconds(5)));
 
-            //4、注册UDF
-            //日期转换函数: 将Flink Window Start/End Timestamp转换为指定时区时间(默认转换为北京时间)
-            streamTableEnvironment.registerFunction("UDFTimestampConverter", new UDFTimestampConverter());
+        // 注册kafka关联表
+        streamTableEnvironment.createTemporaryView("kafka_asset_in_flow", inFlowProcessStream, "srcId,srcIp,srcPort,areaId,l4p,inFlow,rowtime.rowtime");
+        streamTableEnvironment.createTemporaryView("kafka_asset_out_flow", outFlowProcessStream, "srcId,srcIp,srcPort,areaId,l4p,outFlow,rowtime.rowtime");
 
-            // 运行sql
-            String intervalTime1 = "'" + intervalOriginal + "' MINUTE";
-            // 第一个算子计算样本总量(求样本均值)
-            String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(inFlow) as flowSize,count(1) as totalCount," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
-                    "from kafka_asset_in_flow " +
-                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
+        //4、注册UDF
+        //日期转换函数: 将Flink Window Start/End Timestamp转换为指定时区时间(默认转换为北京时间)
+        streamTableEnvironment.registerFunction("UDFTimestampConverter", new UDFTimestampConverter());
 
-            String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(outFlow) as flowSize,count(1) as totalCount," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
-                    "from kafka_asset_out_flow " +
-                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
+        // 运行sql
+        String intervalTime1 = "'" + intervalOriginal + "' MINUTE";
+        // 第一个算子计算样本总量(求样本均值)
+        String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(inFlow) as flowSize,count(1) as totalCount," +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                "from kafka_asset_in_flow " +
+                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
 
-            // 获取结果
-            Table inFlowTable = streamTableEnvironment.sqlQuery(inFlowSql);
-            Table outFlowTable = streamTableEnvironment.sqlQuery(outFlowSql);
+        String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(outFlow) as flowSize,count(1) as totalCount," +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                "from kafka_asset_out_flow " +
+                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
 
-            DataStream<FlowParserEntity> inFlowSinkEntityDataStream = streamTableEnvironment.toAppendStream(inFlowTable, FlowParserEntity.class);
-            DataStream<FlowParserEntity> outFlowSinkEntityDataStream = streamTableEnvironment.toAppendStream(outFlowTable, FlowParserEntity.class);
+        // 获取结果
+        Table inFlowTable = streamTableEnvironment.sqlQuery(inFlowSql);
+        Table outFlowTable = streamTableEnvironment.sqlQuery(outFlowSql);
+
+        DataStream<FlowParserEntity> inFlowSinkEntityDataStream = streamTableEnvironment.toAppendStream(inFlowTable, FlowParserEntity.class);
+        DataStream<FlowParserEntity> outFlowSinkEntityDataStream = streamTableEnvironment.toAppendStream(outFlowTable, FlowParserEntity.class);
 
 
-            // 注册kafka关联表
-            streamTableEnvironment.createTemporaryView("calculate_in_flow", inFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
-            streamTableEnvironment.createTemporaryView("calculate_out_flow", outFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
+        // 注册kafka关联表
+        streamTableEnvironment.createTemporaryView("calculate_in_flow", inFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
+        streamTableEnvironment.createTemporaryView("calculate_out_flow", outFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
 
-            // 第二个算子计算样本方差
-            String intervalTime2 = "'" + intervalOriginal * 5 + "' MINUTE";
-            String inFlowCalculate = "select srcId,srcIp,areaId,protocol," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
-                    "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
-                    "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
-                    " from calculate_in_flow " +
-                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
+        // 第二个算子计算样本方差
+        String intervalTime2 = "'" + intervalOriginal * 5 + "' MINUTE";
+        String inFlowCalculate = "select srcId,srcIp,areaId,protocol," +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
+                "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
+                "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
+                " from calculate_in_flow " +
+                " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
 
-            String outFlowCalculate = "select srcId,srcIp,areaId,protocol," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
-                    "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
-                    "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
-                    " from calculate_in_flow " +
-                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
+        String outFlowCalculate = "select srcId,srcIp,areaId,protocol," +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
+                "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
+                "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
+                " from calculate_in_flow " +
+                " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
 
-            Table inFlowCalculateTable = streamTableEnvironment.sqlQuery(inFlowCalculate);
-            Table outFlowCalculateTable = streamTableEnvironment.sqlQuery(outFlowCalculate);
+        Table inFlowCalculateTable = streamTableEnvironment.sqlQuery(inFlowCalculate);
+        Table outFlowCalculateTable = streamTableEnvironment.sqlQuery(outFlowCalculate);
 
-            DataStream<JSONObject> inFlowStaticStream = streamTableEnvironment.toAppendStream(inFlowCalculateTable, FlowStaticEntity.class)
-                    .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
-                        JSONObject json = value.toJSONObject();
-                        //0 下行流量 in ;1 上行流量 out'
-                        json.put("flowType", 0);
-                        return json;
-                    });
+        DataStream<JSONObject> inFlowStaticStream = streamTableEnvironment.toAppendStream(inFlowCalculateTable, FlowStaticEntity.class)
+                .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
+                    JSONObject json = value.toJSONObject();
+                    //0 下行流量 in ;1 上行流量 out'
+                    json.put("flowType", 0);
+                    return json;
+                });
 
-            DataStream<JSONObject> outFlowStaticStream = streamTableEnvironment.toAppendStream(outFlowCalculateTable, FlowStaticEntity.class)
-                    .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
-                        JSONObject json = value.toJSONObject();
-                        //0 下行流量 in ;1 上行流量 out'
-                        json.put("flowType", 1);
-                        return json;
-                    });
+        DataStream<JSONObject> outFlowStaticStream = streamTableEnvironment.toAppendStream(outFlowCalculateTable, FlowStaticEntity.class)
+                .map((MapFunction<FlowStaticEntity, JSONObject>) value -> {
+                    JSONObject json = value.toJSONObject();
+                    //0 下行流量 in ;1 上行流量 out'
+                    json.put("flowType", 1);
+                    return json;
+                });
 
-            // sink
-            inFlowStaticStream.addSink(new SessionFlowSink());
-            outFlowStaticStream.addSink(new SessionFlowSink());
+        // sink
+        inFlowStaticStream.addSink(new SessionFlowSink());
+        outFlowStaticStream.addSink(new SessionFlowSink());
 
-        }
 
-        // 检测系列操作
-        {
-            /*SingleOutputStreamOperator<String> checkStreamMap = kafkaSourceFilter.map(new CheckModelMapSourceFunction());
-            SingleOutputStreamOperator<String> matchCheckStreamFilter = checkStreamMap.filter((FilterFunction<String>) value -> {
-                if (StringUtil.isEmpty(value)) {
-                    return false;
-                }
-                return true;
-            });
-
-            // 将过滤数据送往kafka  topic
-            String brokers = ConversionUtil.toString(props.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-            String checkTopic = ConversionUtil.toString(props.getProperty("check.topic"));
-            matchCheckStreamFilter.addSink(new FlinkKafkaProducer010<>(
-                    brokers,
-                    checkTopic,
-                    new KeyedSerializationSchemaWrapper<>(new SimpleStringSchema())
-            ));*/
-        }
         try {
             streamExecutionEnvironment.execute("kafka message streaming start ....");
         } catch (Exception e) {
