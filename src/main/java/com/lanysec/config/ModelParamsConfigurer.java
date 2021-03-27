@@ -1,13 +1,8 @@
 package com.lanysec.config;
 
-import com.lanysec.services.AssetBehaviorConstants;
+import com.lanysec.services.AssetSessionVisitConstants;
 import com.lanysec.utils.ConversionUtil;
 import com.lanysec.utils.DbConnectUtil;
-import com.lanysec.utils.SystemUtil;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.io.jdbc.JDBCInputFormat;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -25,15 +20,11 @@ import java.util.Map;
  * @author daijb
  * @date 2021/3/8 16:24
  */
-public class ModelParamsConfigurer implements AssetBehaviorConstants {
+public class ModelParamsConfigurer implements AssetSessionVisitConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelParamsConfigurer.class);
 
-    //private static final JDBCInputFormat jdbcInputFormat = getModelingParamsStream0();
-
-    private static Map<String, Object> modelingParams;
-
-    private static volatile boolean isFirst = true;
+    private static volatile Map<String, Object> modelingParams;
 
     /**
      * 返回建模参数
@@ -83,42 +74,9 @@ public class ModelParamsConfigurer implements AssetBehaviorConstants {
         return result;
     }
 
-    /**
-     * 获取建模参数
-     */
-    private static JDBCInputFormat getModelingParamsStream0() {
-        TypeInformation<?>[] fieldTypes = new TypeInformation<?>[]{
-                BasicTypeInfo.STRING_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.STRING_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.STRING_TYPE_INFO,
-                BasicTypeInfo.FLOAT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.INT_TYPE_INFO,
-                BasicTypeInfo.STRING_TYPE_INFO,
-                BasicTypeInfo.STRING_TYPE_INFO,
-                BasicTypeInfo.DATE_TYPE_INFO,
-        };
-        RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldTypes);
-        String addr = SystemUtil.getHostIp();
-        return JDBCInputFormat.buildJDBCInputFormat()
-                .setDrivername("com.mysql.jdbc.Driver")
-                .setDBUrl("jdbc:mysql://" + addr + ":3306/csp?useEncoding=true&characterEncoding=utf-8&serverTimezone=UTC")
-                .setUsername(SystemUtil.getMysqlUser())
-                .setPassword(SystemUtil.getMysqlPassword())
-                .setQuery("select * from modeling_params where model_type='1' and model_child_type='3';")
-                .setRowTypeInfo(rowTypeInfo)
-                .finish();
-    }
+    private static volatile List<Map<String, Object>> lastBuildModelResult;
 
-    private static volatile List<Map<String, JSONArray>> lastBuildModelResult;
-
-    public static List<Map<String, JSONArray>> getLastBuildModelResult() {
+    public static List<Map<String, Object>> getLastBuildModelResult() {
         if (lastBuildModelResult == null) {
             queryLastBuildModelResult();
         }
@@ -130,18 +88,21 @@ public class ModelParamsConfigurer implements AssetBehaviorConstants {
      */
     public static void queryLastBuildModelResult() {
 
-        List<Map<String, JSONArray>> result = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
         String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
-        String querySql = "select src_id,flow from model_result_asset_session_flow " +
+        String querySql = "select src_id,flow,protocol from model_result_asset_session_flow " +
                 "where modeling_params_id='" + modelId + "';";
         try {
             ResultSet resultSet = DbConnectUtil.getConnection().createStatement().executeQuery(querySql);
             while (resultSet.next()) {
-                Map<String, JSONArray> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 String srcId = resultSet.getString("src_id");
+                String protocol = resultSet.getString("protocol");
                 String segmentStr = resultSet.getString("flow");
                 JSONArray segmentArr = (JSONArray) JSONValue.parse(segmentStr);
-                map.put(srcId, segmentArr);
+                map.put("srcId", srcId);
+                map.put("protocol", protocol);
+                map.put("segmentArr", segmentArr);
                 result.add(map);
             }
         } catch (SQLException sqlException) {

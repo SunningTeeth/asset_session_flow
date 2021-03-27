@@ -2,7 +2,6 @@ package com.lanysec.services;
 
 import com.lanysec.config.ModelParamsConfigurer;
 import com.lanysec.utils.*;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.json.simple.JSONArray;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,18 +22,21 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author daijb
  * @date 2021/3/8 22:41
- * CREATE TABLE `model_result_asset_session_flow` (
- * `id` int(11) NOT NULL COMMENT 'ID',
- * `modeling_params_id` varchar(64) NOT NULL COMMENT '模型参数ID。根据模型参数ID可以知道建模的类型及子类型',
- * `src_id` varchar(100) DEFAULT NULL COMMENT '源资产ID',
- * `src_ip` text COMMENT '资产源IP',
- * `protocol` varchar(255) DEFAULT NULL COMMENT '通信协议',
- * `flow` text COMMENT '流量大小置信区间统计。json格式，key 从1开始到 （模型结果时长/频率）例，一周每天的访问模型 结果为[  {"name": "1",\r\n  "value": "0-9"},\r\n  {"name": "2",\r\n  "value": "1-56"},\r\n  {"name": "3",\r\n  "value": "2-3"},\r\n  {"name": "4",\r\n  "value": "4-9"},\r\n  {"name": "5",\r\n  "value": "76-908"}\r\n]。value用英文"-"连接最低和最高值。\r\n最低和最高，用样本数量，求出样本方差。根据用户输入的置信度，根据标准正态分布表求出置信区间。',
- * `up_down` int(11) DEFAULT NULL COMMENT '上下行区分。0 下行流量 in ;1 上行流量 out',
- * `in_out` int(11) DEFAULT NULL COMMENT '内外网区分。目的IP在内网网段（10.0.0.0-10.255.255.255；172.16.0.0-172.31.255.255；192.168.0.0-192.168.255.255）0 。其他外网 1',
- * `time` datetime DEFAULT NULL COMMENT '数据插入时间',
- * PRIMARY KEY (`id`) USING BTREE
- * ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+ * DROP TABLE IF EXISTS `model_result_asset_session_flow`;
+ * CREATE TABLE `model_result_asset_session_flow`
+ * (
+ * `id`                 varchar(32)  NOT NULL COMMENT 'ID',
+ * `modeling_params_id` varchar(64)  NOT NULL COMMENT '模型参数ID。根据模型参数ID可以知道建模的类型及子类型',
+ * `src_id`             varchar(100) NOT NULL COMMENT '源资产ID',
+ * `src_ip`             text COMMENT '资产源IP',
+ * `protocol`           varchar(255) NOT NULL COMMENT '通信协议',
+ * `flow`               text COMMENT '流量大小置信区间统计。json格式，key 从1开始到 （模型结果时长/频率）例，一周每天的访问模型 结果为[  {"name": "1",\r\n  "value": "0-9"},\r\n  {"name": "2",\r\n  "value": "1-56"},\r\n  {"name": "3",\r\n  "value": "2-3"},\r\n  {"name": "4",\r\n  "value": "4-9"},\r\n  {"name": "5",\r\n  "value": "76-908"}\r\n]。value用英文"-"连接最低和最高值。\r\n最低和最高，用样本数量，求出样本方差。根据用户输入的置信度，根据标准正态分布表求出置信区间。',
+ * `up_down`            int(11)  DEFAULT NULL COMMENT '上下行区分。0 下行流量 in ;1 上行流量 out',
+ * `in_out`             int(11)  DEFAULT NULL COMMENT '内外网区分。目的IP在内网网段（10.0.0.0-10.255.255.255；172.16.0.0-172.31.255.255；192.168.0.0-192.168.255.255）0 。其他外网 1',
+ * `time`               datetime DEFAULT NULL COMMENT '数据插入时间',
+ * PRIMARY KEY (`src_id`, `protocol`, `modeling_params_id`)
+ * ) ENGINE = InnoDB
+ * DEFAULT CHARSET = utf8;
  */
 public class SessionFlowSink extends RichSinkFunction<JSONObject> {
 
@@ -50,6 +51,8 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
     private volatile boolean isFirst = true;
 
     private final AtomicInteger batchSize = new AtomicInteger();
+
+    private final int MAX_BATCH_SIZE = 200;
 
     /**
      * 记录历史数据天数
@@ -69,10 +72,9 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         String sql = "INSERT INTO `model_result_asset_session_flow` (`id`, `modeling_params_id`, `src_id`, `src_ip`, `protocol`, `flow`, `up_down`, `in_out`, `time`)" +
-                " values (?,?,?,?,?,?,?,?,?) ";
-        //"ON DUPLICATE KEY UPDATE `dst_ip_segment`=?";
-        BasicDataSource dataSource = new BasicDataSource();
-        connection = getConnection(dataSource);
+                " values (?,?,?,?,?,?,?,?,?) " +
+                "ON DUPLICATE KEY UPDATE `flow`=?";
+        connection = DbConnectUtil.getConnection();
         ps = connection.prepareStatement(sql);
     }
 
@@ -92,18 +94,31 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         }
 
         String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
-        List<Map<String, JSONArray>> lastBuildModelResult = queryLastBuildModelResult();
+        String srcId = ConversionUtil.toString(value.get("srcId"));
+        String protocol = ConversionUtil.toString(value.get("protocol"));
+        String srcIp = ConversionUtil.toString(value.get("srcIp"));
+        List<Map<String, Object>> lastBuildModelResult = ModelParamsConfigurer.getLastBuildModelResult();
         String key = ConversionUtil.toString(calculateSegmentCurrKey());
-        String entityId = ConversionUtil.toString(value.get("srcId"));
         JSONArray segment = null;
-        for (Map<String, JSONArray> item : lastBuildModelResult) {
-            if (item.get(entityId) != null) {
-                segment = item.get(entityId);
-                break;
+        for (Map<String, Object> item : lastBuildModelResult) {
+            String srcId0 = ConversionUtil.toString(item.get("srcId"));
+            String protocol0 = ConversionUtil.toString(item.get("protocol"));
+            if (StringUtil.equals(srcId, srcId0) && StringUtil.equals(protocol, protocol0)) {
+                Object segmentObj = item.get("segmentArr");
+                if (segmentObj != null && !StringUtil.isEmpty(segmentObj.toString())) {
+                    segment = (JSONArray) JSONValue.parse(segmentObj.toString());
+                    break;
+                }
             }
         }
         JSONObject json = new JSONObject();
-        String calculateValue = value.get("minFlowSize") + "-" + value.get("maxFlowSize");
+        double minFlowSize = ConversionUtil.toDouble(value.get("minFlowSize"));
+        if (minFlowSize < 0) {
+            minFlowSize = 0;
+        } else {
+            minFlowSize = ConversionUtil.toDouble((minFlowSize / 1024));
+        }
+        String calculateValue = minFlowSize + "-" + ConversionUtil.toDouble((ConversionUtil.toDouble(value.get("maxFlowSize")) / 1024));
         json.put("name", key);
         json.put("value", calculateValue);
         if (segment != null) {
@@ -121,19 +136,19 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         }
         ps.setString(1, "msf_" + UUIDUtil.genId());
         ps.setString(2, modelId);
-        ps.setString(3, ConversionUtil.toString(value.get("srcId")));
-        ps.setString(4, ConversionUtil.toString(value.get("srcIp")));
-        ps.setString(5, ConversionUtil.toString(value.get("protocol")));
+        ps.setString(3, srcId);
+        ps.setString(4, srcIp);
+        ps.setString(5, protocol);
         ps.setString(6, segment.toJSONString());
         //0 下行流量 in ;1 上行流量 out'
         ps.setInt(7, ConversionUtil.toInt(value.get("flowType")));
-        ps.setInt(8, SystemUtil.isInternalIp(ConversionUtil.toString(value.get("srcIp"))));
+        ps.setInt(8, SystemUtil.isInternalIp(srcIp));
         ps.setString(9, LocalDateTime.now().toString());
+        ps.setString(10, segment.toJSONString());
         ps.addBatch();
         batchSize.incrementAndGet();
-        if (batchSize.get() > 200) {
+        if (batchSize.get() > MAX_BATCH_SIZE) {
             ps.executeBatch();
-            logger.info("插入了" + batchSize.get() + "条数据.");
             batchSize.set(0);
         }
 
@@ -162,58 +177,6 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
     }
 
     /**
-     * 查询上次建模结果
-     */
-    public List<Map<String, JSONArray>> queryLastBuildModelResult() {
-        List<Map<String, JSONArray>> result = new ArrayList<>();
-        String modelId = ConversionUtil.toString(ModelParamsConfigurer.getModelingParams().get("modelId"));
-        String querySql = "select src_id,flow from model_result_asset_session_flow " +
-                "where modeling_params_id='" + modelId + "';";
-        try {
-            ResultSet resultSet = DbConnectUtil.getConnection().createStatement().executeQuery(querySql);
-            while (resultSet.next()) {
-                Map<String, JSONArray> map = new HashMap<>();
-                String srcId = resultSet.getString("src_id");
-                String segmentStr = resultSet.getString("flow");
-                JSONArray segmentArr = (JSONArray) JSONValue.parse(segmentStr);
-                map.put(srcId, segmentArr);
-                result.add(map);
-            }
-        } catch (SQLException sqlException) {
-            logger.error("query build `session_flow` model result failed", sqlException);
-        }
-        return result;
-    }
-
-    private static Connection getConnection(BasicDataSource dataSource) {
-        String addr = SystemUtil.getHostIp();
-        String username = SystemUtil.getMysqlUser();
-        String password = SystemUtil.getMysqlPassword();
-        String url = "jdbc:mysql://" + addr + ":3306/csp?useEncoding=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC";
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-
-        //初始化的连接数
-        dataSource.setInitialSize(3);
-        //最大连接数
-        dataSource.setMaxTotal(5);
-        //最大空闲数
-        dataSource.setMaxIdle(2);
-        //最小空闲数
-        dataSource.setMinIdle(1);
-
-        Connection con = null;
-        try {
-            con = dataSource.getConnection();
-        } catch (Exception e) {
-            logger.error("create mysql connect pool failed", e);
-        }
-        return con;
-    }
-
-    /**
      * 建模结果周期：1 代表一天。
      * 2 代表一周。3 代表一季度。
      * 4 代表一年。如果总长度填写 1 ，建模的时间单位可以是 ss mm hh 。周的建模时间单位只能是 dd 。其他的只能为月
@@ -232,7 +195,7 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
      */
     private Object calculateSegmentCurrKey() throws Exception {
         // 建模周期
-        int cycle = ConversionUtil.toInteger(ModelParamsConfigurer.getModelingParams().get(AssetBehaviorConstants.MODEL_RESULT_SPAN));
+        int cycle = ConversionUtil.toInteger(ModelParamsConfigurer.getModelingParams().get(AssetSessionVisitConstants.MODEL_RESULT_SPAN));
         LocalDateTime now = LocalDateTime.now();
         Object segmentKey = null;
         switch (cycle) {
@@ -265,11 +228,11 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
      *
      * @param modelStatus 状态枚举
      */
-    private void updateModelTaskStatus(AssetBehaviorConstants.ModelStatus modelStatus) {
+    private void updateModelTaskStatus(AssetSessionVisitConstants.ModelStatus modelStatus) {
         while (!modelTaskStatusLock.tryLock()) {
         }
         try {
-            String updateSql = "UPDATE `modeling_params` SET `model_task_status`=?, `modify_time`=? WHERE (`id`='" + modelingParams.get(AssetBehaviorConstants.MODEL_ID) + "');";
+            String updateSql = "UPDATE `modeling_params` SET `model_task_status`=?, `modify_time`=? WHERE (`id`='" + modelingParams.get(AssetSessionVisitConstants.MODEL_ID) + "');";
             PreparedStatement ps = connection.prepareStatement(updateSql);
             ps.setString(1, modelStatus.toString().toLowerCase());
             ps.setString(2, LocalDateTime.now().toString());
@@ -318,7 +281,7 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         if (modelParamsChange) {
             // 说明此时出现：同一个模型 多个不同的维度(设计要求，同一个模型只能有一个维度生效)
             state = ServiceState.Stopped;
-            updateModelTaskStatus(AssetBehaviorConstants.ModelStatus.STOP);
+            updateModelTaskStatus(AssetSessionVisitConstants.ModelStatus.STOP);
             //更新建模参数
             ModelParamsConfigurer.reloadModelingParams();
             this.modelingParams = ModelParamsConfigurer.getModelingParams();
@@ -333,18 +296,18 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
             // 1(true)累计迭代历史数据更新。
             // 模型结果的唯一性:模型分类 & 模型子类 & 频率 & 频数
             // 更改 历史数据和置信度 更新。
-            boolean modelUpdate = ConversionUtil.toBoolean(newModelingParams.get(AssetBehaviorConstants.MODEL_UPDATE));
+            boolean modelUpdate = ConversionUtil.toBoolean(newModelingParams.get(AssetSessionVisitConstants.MODEL_UPDATE));
             if (!modelUpdate) {
                 // 清除历史数据更新
                 if (connection == null) {
                     connection = DbConnectUtil.getConnection();
                 }
                 String deleteSql = "DELETE FROM model_result_asset_behavior_relation WHERE modeling_params_id ='"
-                        + newModelingParams.get(AssetBehaviorConstants.MODEL_ID).toString() + "';";
+                        + newModelingParams.get(AssetSessionVisitConstants.MODEL_ID).toString() + "';";
                 try {
                     boolean result = connection.createStatement().execute(deleteSql);
                 } catch (SQLException sqlException) {
-                    updateModelTaskStatus(AssetBehaviorConstants.ModelStatus.FAILED);
+                    updateModelTaskStatus(AssetSessionVisitConstants.ModelStatus.FAILED);
                     logger.error("exec clear history data failed.", sqlException);
                 }
             }
@@ -366,15 +329,15 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
             this.modelingParams = ModelParamsConfigurer.getModelingParams();
             state = ServiceState.Stopped;
             // 更新状态
-            updateModelTaskStatus(AssetBehaviorConstants.ModelStatus.FAILED);
+            updateModelTaskStatus(AssetSessionVisitConstants.ModelStatus.FAILED);
             return;
         }
-        if (ConversionUtil.toBoolean(this.modelingParams.get(AssetBehaviorConstants.MODEL_SWITCH))) {
+        if (ConversionUtil.toBoolean(this.modelingParams.get(AssetSessionVisitConstants.MODEL_SWITCH))) {
             state = ServiceState.Ready;
         } else {
             state = ServiceState.Stopped;
             // 更新状态
-            updateModelTaskStatus(AssetBehaviorConstants.ModelStatus.FAILED);
+            updateModelTaskStatus(AssetSessionVisitConstants.ModelStatus.FAILED);
         }
     }
 
@@ -384,8 +347,8 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
     private boolean modelUpdateChange(Map<String, Object> newModelingParams) {
 
         // 更新方式
-        Integer newModelUpdate = ConversionUtil.toInteger(newModelingParams.get(AssetBehaviorConstants.MODEL_UPDATE));
-        Integer oldModelUpdate = ConversionUtil.toInteger(modelingParams.get(AssetBehaviorConstants.MODEL_UPDATE));
+        Integer newModelUpdate = ConversionUtil.toInteger(newModelingParams.get(AssetSessionVisitConstants.MODEL_UPDATE));
+        Integer oldModelUpdate = ConversionUtil.toInteger(modelingParams.get(AssetSessionVisitConstants.MODEL_UPDATE));
         if (newModelUpdate != null && !newModelUpdate.equals(oldModelUpdate)) {
             return true;
         }
@@ -401,24 +364,24 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         Map<String, Object> modelingParams = this.modelingParams;
         // 建模周期 model_result_span
         boolean modelResultSpanFlag = false;
-        Integer newModelResultSpan = ConversionUtil.toInteger(newModelingParams.get(AssetBehaviorConstants.MODEL_RESULT_SPAN));
-        Integer oldModelResultSpan = ConversionUtil.toInteger(modelingParams.get(AssetBehaviorConstants.MODEL_RESULT_SPAN));
+        Integer newModelResultSpan = ConversionUtil.toInteger(newModelingParams.get(AssetSessionVisitConstants.MODEL_RESULT_SPAN));
+        Integer oldModelResultSpan = ConversionUtil.toInteger(modelingParams.get(AssetSessionVisitConstants.MODEL_RESULT_SPAN));
         if (newModelResultSpan != null && !newModelResultSpan.equals(oldModelResultSpan)) {
             modelResultSpanFlag = true;
         }
 
         // 模型建模的频率 model_rate_timeunit
         boolean modelRateTimeUnitFlag = false;
-        String newModelRateTimeUnit = ConversionUtil.toString(newModelingParams.get(AssetBehaviorConstants.MODEL_RATE_TIME_UNIT));
-        String oldModelRateTimeUnit = ConversionUtil.toString(modelingParams.get(AssetBehaviorConstants.MODEL_RATE_TIME_UNIT));
+        String newModelRateTimeUnit = ConversionUtil.toString(newModelingParams.get(AssetSessionVisitConstants.MODEL_RATE_TIME_UNIT));
+        String oldModelRateTimeUnit = ConversionUtil.toString(modelingParams.get(AssetSessionVisitConstants.MODEL_RATE_TIME_UNIT));
         if (StringUtil.equals(newModelRateTimeUnit, oldModelRateTimeUnit)) {
             modelRateTimeUnitFlag = true;
         }
 
         // 建模频率时间单位对应的数值 model_rate_timeunit_num
         boolean modelRateTimeUnitNumFlag = false;
-        Integer newModelRateTimeUnitNum = ConversionUtil.toInteger(newModelingParams.get(AssetBehaviorConstants.MODEL_RATE_TIME_UNIT_NUM));
-        Integer oldModelRateTimeUnitNum = ConversionUtil.toInteger(modelingParams.get(AssetBehaviorConstants.MODEL_RATE_TIME_UNIT_NUM));
+        Integer newModelRateTimeUnitNum = ConversionUtil.toInteger(newModelingParams.get(AssetSessionVisitConstants.MODEL_RATE_TIME_UNIT_NUM));
+        Integer oldModelRateTimeUnitNum = ConversionUtil.toInteger(modelingParams.get(AssetSessionVisitConstants.MODEL_RATE_TIME_UNIT_NUM));
         if (newModelRateTimeUnitNum != null && !newModelRateTimeUnitNum.equals(oldModelRateTimeUnitNum)) {
             modelRateTimeUnitNumFlag = true;
         }
@@ -439,10 +402,10 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
     private boolean checkModelHistoryDataDays(Map<String, Object> newModelingParams) {
 
         // 所需历史天数 model_history_data_span
-        Integer newModelHistoryData = ConversionUtil.toInteger(newModelingParams.get(AssetBehaviorConstants.MODEL_HISTORY_DATA_SPAN));
-        Integer oldModelHistoryData = ConversionUtil.toInteger(modelingParams.get(AssetBehaviorConstants.MODEL_HISTORY_DATA_SPAN));
+        Integer newModelHistoryData = ConversionUtil.toInteger(newModelingParams.get(AssetSessionVisitConstants.MODEL_HISTORY_DATA_SPAN));
+        Integer oldModelHistoryData = ConversionUtil.toInteger(modelingParams.get(AssetSessionVisitConstants.MODEL_HISTORY_DATA_SPAN));
         if (newModelHistoryData != null && !newModelHistoryData.equals(oldModelHistoryData)) {
-            this.historyDataDays = ConversionUtil.toInteger(newModelingParams.get(AssetBehaviorConstants.MODEL_HISTORY_DATA_SPAN));
+            this.historyDataDays = ConversionUtil.toInteger(newModelingParams.get(AssetSessionVisitConstants.MODEL_HISTORY_DATA_SPAN));
             return true;
         }
         return false;

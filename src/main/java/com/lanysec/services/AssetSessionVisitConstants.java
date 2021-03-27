@@ -4,7 +4,7 @@ package com.lanysec.services;
  * @author daijb
  * @date 2021/3/8 16:24
  */
-public interface AssetBehaviorConstants {
+public interface AssetSessionVisitConstants {
 
     /**
      * 模型ID

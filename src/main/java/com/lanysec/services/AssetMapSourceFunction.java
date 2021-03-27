@@ -2,23 +2,15 @@ package com.lanysec.services;
 
 import com.lanysec.utils.ConversionUtil;
 import com.lanysec.utils.DbConnectUtil;
-import com.lanysec.utils.StringUtil;
-import com.lanysec.utils.SystemUtil;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author daijb

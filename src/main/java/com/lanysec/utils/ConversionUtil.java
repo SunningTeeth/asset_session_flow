@@ -78,54 +78,43 @@ public class ConversionUtil {
         return defaultValue;
     }
 
-    public static long str2seconds(String str) {
-        if (StringUtil.isEmpty(str)) {
-            return 0;
-        }
-        int begin = 0;
-        int cursor = 1;
-        long seconds = 0;
-        while (cursor < str.length()) {
-            if (str.charAt(cursor) >= 'a' && str.charAt(cursor) <= 'z') {
-                cursor++;
-                String sstr = str.substring(begin, cursor);
-                seconds += str2seconds0(sstr);
-                begin = cursor;
-            }
-            cursor++;
-        }
-        if (begin < str.length()) {
-            seconds += str2seconds0(str.substring(begin));
-        }
-        return seconds;
+    public static double toDouble(Object obj) {
+        double v = toDouble(obj, false);
+        return (double) Math.round(v * 100) / 100;
     }
 
-    /**
-     * Convert 1s, 1 to 1 seconds, 1m to 60 seconds, 1h to 3600 seconds, 1d to ***
-     */
-    private static long str2seconds0(String str) {
-        if (StringUtil.isEmpty(str)) {
+    public static double toDouble(Object obj, boolean catchException) {
+        if (obj == null) {
             return 0;
         }
-        long unit = 1;
-        if (str.endsWith("s")) {
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("m")) {
-            unit = 60;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("h")) {
-            unit = 60 * 60;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("d")) {
-            unit = 60 * 60 * 24;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("M")) {
-            unit = 30 * 24 * 60 * 60;
-            str = str.substring(0, str.length() - 1);
-        } else if (str.endsWith("q")) {
-            unit = 4 * 30 * 24 * 60 * 60;
-            str = str.substring(0, str.length() - 1);
+        if (obj instanceof Number) {
+            return ((Number) obj).doubleValue();
         }
-        return ((long) (Double.parseDouble(str))) * unit;
+        try {
+            return Double.parseDouble(obj.toString().trim());
+        } catch (RuntimeException re) {
+            if (catchException) {
+                return Double.NaN;
+            }
+            throw re;
+        }
+    }
+
+    public static int str2Minutes(String str) {
+        if (StringUtil.isEmpty(str)) {
+            return 5;
+        }
+        str = str.toLowerCase().trim();
+        if (str.endsWith("m")) {
+            str = str.substring(0, str.length() - 1);
+            return toInt(str);
+        } else if (str.endsWith("h")) {
+            str = str.substring(0, str.length() - 1);
+            return toInt(str) * 60;
+        } else {
+            //day
+            str = str.substring(0, str.length() - 1);
+            return toInt(str) * 60 * 24;
+        }
     }
 }

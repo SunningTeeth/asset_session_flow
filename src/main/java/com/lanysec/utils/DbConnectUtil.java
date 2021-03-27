@@ -1,6 +1,5 @@
 package com.lanysec.utils;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +19,10 @@ public class DbConnectUtil {
 
     public static Connection getConnection() {
         BasicDataSource dataSource = new BasicDataSource();
-        String addr = SystemUtil.getHostIp();
-        String username = SystemUtil.getMysqlUser();
-        String password = SystemUtil.getMysqlPassword();
-        String url = "jdbc:mysql://" + addr + ":3306/csp?useEncoding=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC";
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
+        dataSource.setUrl(SystemUtil.getJdbcUrl());
+        dataSource.setUsername(SystemUtil.getMysqlUser());
+        dataSource.setPassword(SystemUtil.getMysqlPassword());
 
         //初始化的连接数
         dataSource.setInitialSize(3);

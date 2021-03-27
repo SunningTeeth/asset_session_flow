@@ -10,1371 +10,756 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2021-03-24 10:37:34
+Date: 2021-03-27 13:10:29
 */
 
-SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for model_result_asset_session_flow
 -- ----------------------------
 DROP TABLE IF EXISTS `model_result_asset_session_flow`;
-CREATE TABLE `model_result_asset_session_flow` (
-  `id` varchar(32) NOT NULL COMMENT 'ID',
-  `modeling_params_id` varchar(64) NOT NULL COMMENT '模型参数ID。根据模型参数ID可以知道建模的类型及子类型',
-  `src_id` varchar(100) NOT NULL COMMENT '源资产ID',
-  `src_ip` text COMMENT '资产源IP',
-  `protocol` varchar(255) NOT NULL COMMENT '通信协议',
-  `flow` text COMMENT '流量大小置信区间统计。json格式，key 从1开始到 （模型结果时长/频率）例，一周每天的访问模型 结果为[  {"name": "1",\r\n  "value": "0-9"},\r\n  {"name": "2",\r\n  "value": "1-56"},\r\n  {"name": "3",\r\n  "value": "2-3"},\r\n  {"name": "4",\r\n  "value": "4-9"},\r\n  {"name": "5",\r\n  "value": "76-908"}\r\n]。value用英文"-"连接最低和最高值。\r\n最低和最高，用样本数量，求出样本方差。根据用户输入的置信度，根据标准正态分布表求出置信区间。',
-  `up_down` int(11) DEFAULT NULL COMMENT '上下行区分。0 下行流量 in ;1 上行流量 out',
-  `in_out` int(11) DEFAULT NULL COMMENT '内外网区分。目的IP在内网网段（10.0.0.0-10.255.255.255；172.16.0.0-172.31.255.255；192.168.0.0-192.168.255.255）0 。其他外网 1',
-  `time` datetime DEFAULT NULL COMMENT '数据插入时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `model_result_asset_session_flow`
+(
+    `id`                 varchar(32)  NOT NULL COMMENT 'ID',
+    `modeling_params_id` varchar(64)  NOT NULL COMMENT '模型参数ID。根据模型参数ID可以知道建模的类型及子类型',
+    `src_id`             varchar(100) NOT NULL COMMENT '源资产ID',
+    `src_ip`             text COMMENT '资产源IP',
+    `protocol`           varchar(255) NOT NULL COMMENT '通信协议',
+    `flow`               text COMMENT '流量大小置信区间统计。json格式，key 从1开始到 （模型结果时长/频率）例，一周每天的访问模型 结果为[  {"name": "1",\r\n  "value": "0-9"},\r\n  {"name": "2",\r\n  "value": "1-56"},\r\n  {"name": "3",\r\n  "value": "2-3"},\r\n  {"name": "4",\r\n  "value": "4-9"},\r\n  {"name": "5",\r\n  "value": "76-908"}\r\n]。value用英文"-"连接最低和最高值。\r\n最低和最高，用样本数量，求出样本方差。根据用户输入的置信度，根据标准正态分布表求出置信区间。',
+    `up_down`            int(11)  DEFAULT NULL COMMENT '上下行区分。0 下行流量 in ;1 上行流量 out',
+    `in_out`             int(11)  DEFAULT NULL COMMENT '内外网区分。目的IP在内网网段（10.0.0.0-10.255.255.255；172.16.0.0-172.31.255.255；192.168.0.0-192.168.255.255）0 。其他外网 1',
+    `time`               datetime DEFAULT NULL COMMENT '数据插入时间',
+    PRIMARY KEY (`src_id`, `protocol`, `modeling_params_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
 
 -- ----------------------------
 -- Records of model_result_asset_session_flow
 -- ----------------------------
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtFAqkNqVFbKwHrpG1V2', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKdszwgndTmZbJCM3XfiG', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtF61Z6NsZzuzTwGhcLQ', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtFLW8wkicn9pwhuNonG', 'msf_daijb', 'ast_88145a6a6e733b5033fb89c69dc2f5d2', '192.168.8.179', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtFRLLEDLJNZmmdSwCvt', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtFFfwfJ6wBjt7nMpQde', 'msf_daijb', 'ast_f9e2cbca9f59b0e24d3a5bce55fcb614', '192.168.8.59', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtFWAXWfwyxyibYzVc5W', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cWQCXxk6otU3Dg79Z2', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8d1PNEiSCNN8zkwTYSk', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuKtF1BMovFtQW3e1j9DBn', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cbEPpRMnQJQs9DfYhe', 'msf_daijb', '192.168.8.179', '192.168.8.179', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cktnPLb9b8JWzJnLzt', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cvZAxFpWmxCAqPu9J8', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cqiyfoCqBYFLurLk9W', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8cg4b6syTziMh4mDwrG', 'msf_daijb', '192.168.8.59', '192.168.8.59', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzWcCxkvQmkZPxtRUoz', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzLwpPqh3avfk7oJgWk', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuL8d6DZXB3sxn5pgV1wbN', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzgGbXg9mxaT3oyYH7E', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzm6np8mTYzPsjX6gFr', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNr8zXPZT7GS4QGyQfS', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmSAMwQ3YE29CcJCXxk', 'msf_daijb', 'ast_437dbe387ac95302a29151184bc42fc5', '192.168.3.12', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNz6TEYTqzogqGMAdV4t', 'msf_daijb', 'ast_5fda2ffd01d92f29ca844cd9eef3a885', '192.168.9.147', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzG7d7P5MzWivCFkHN8', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzbSQFDY6NAWDtRysxc', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzqvz6bP99QLhf4f5QU', 'msf_daijb', 'ast_f9e2cbca9f59b0e24d3a5bce55fcb614', '192.168.8.59', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLP1G5xWtTZ7U4qGnT59a', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzvmBP3zpjpHXacDUZ6', 'msf_daijb', '192.168.3.92', '192.168.3.92', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPM8AE9FYfk71wYKoZA', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzBHRpvTgQ6n6GiBtDW', 'msf_daijb', '192.168.9.147', '192.168.9.147', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLNzRn1gJJjBLca3Ls5fN', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLP11bNfWcWLEEMW9mshi', 'msf_daijb', '192.168.8.59', '192.168.8.59', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmWzZDrfDpS62Xqkw7N', 'msf_daijb', '192.168.3.12', '192.168.3.12', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdP1oP6JnpJ6KiFN6Cxg', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmGVyNUpB3CFYmD5jfW', 'msf_daijb', 'ast_3dc2a391b47f0559df0145dd9e5b0c53', '192.168.9.142', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNM9ppdsMYnm6s1d1mi', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPRxMWbsEGA3qs5tChn', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89MYB5jcAbUHjRxxU56', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuSnPDnaU7cRGqw9Xje', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNGKdYBFfxNpGwU4cd6', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLP16RZwyEBveBBRhLGrL', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPWnYo4UurZzfndSbrQ', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLskggcPGWPtJdmJQAwdA', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNgUbxUL5vSYQZBrcNC', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmMLAewRrdcCNgke8p8', 'msf_daijb', '192.168.9.142', '192.168.9.142', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLP1BFmERqsX481MEtfzx', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNRz276V39ChvnZBQvL', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLskwBCEeMSfYUF52r952', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcucSmnhoqJSJvh2GL2t', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89XCZeeqXnJBPH45GNL', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcv2bkCztFGW34Jk4Kmz', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNWpDPZ6ijceki6jp4x', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsHcenDVz9GJQHSEafHr', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsm21PX6y8FxR4zaQYDe', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNmJoEvwmWrVEUjR1Wp', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNvyBorB8hgNtKpXop4', 'msf_daijb', 'ast_4e7784ef87eedb324280479fdeee6aa3', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89rXLnVJG9wxgyEJrxp', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsm6qaoZaorNMtv7xwNG', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdNbeQg1iQL2badeJDDa', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmBfn62CVSnJiqfXLWt', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNWwbD6Ei4bGexZTUoax', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmbpkWKGuQr2rTPKLFz', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsHnKAnRDWT8HwHKhTb6', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPGHxwgds5LAC1zmQQY', 'msf_daijb', '192.168.8.165', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcv7RwVTVvruytEHcivc', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89SNNNCDrBtEZMWWsDi', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLskbrR6otiHtgwNrcYUY', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvCG8mv7cTKvi9qB85E', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJ2okdo4ZEN8R3xNf2x', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUdBoiQfeWki6uTe2R6', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89grxDa4ty85389C4fa', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdP6daNmQVtWGYAuec7J', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJHJLVAuc1bxtpb3rUp', 'msf_daijb', 'ast_eb64ef168af1538e135ab251196242fc', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmgewnmtb1FygNvsjQc', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPBTmfE2BUvDN6TD1Fv', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLskrLzxBjm58XR9VHjvQ', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJCU9CiHvRC24u3VTLC', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNX7Fbf9wRn6YcQYbbtC', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM88wPCfSXkdQZbpFAUKz', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJN8XmdXHc1uik8cFdS', 'msf_daijb', '192.168.8.153', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvH6L4NjJ3jsY5NjXDr', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUsgPZnWhHzYag6KDrx', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLsmmV95EWGbfvWJUS8ZE', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM8973bEMm7pETFfLHGdE', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXGuzE5AnxvSGFdiQBS', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLdPbck5X6bSywViB1112', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJwwtkqq4kuXWCwX3fn', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5sW3jUxCDB7JrMJ6pY', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6ttfiKFDUpdrzbvt6hv', 'msf_daijb', 'ast_5295488e8c7cdaad97d00d6f652ed34c', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcVHqMz5b7G4GiHp7Dc4', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXmu9vprtXQ7Dnu4o5A', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN63ASJQBZPzzxhSQu7n', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89mh9W2gaZY1s3gkTpC', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6u4L6tASr1TkeT1zu1A', 'msf_daijb', '192.168.8.48', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrV91cvp7qQ6vHUHqPKv', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsK7cHKm4RwjRA42dqy2', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM88mip6XJPSafwyA3g2k', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuLskmWofj85UiabDwjLmn', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6ReyVaZTs1ojrtgB25N', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM88rZ1Nyv52zcmthc5BN', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6Y9c19sexUfvEhmJ1W', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gcq83oYeM7qZFybnLG', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGUikKkKNpSEDjRQSDn', 'msf_daijb', 'ast_77aed692ac257e3123eebdd1aff8d136', '192.168.8.171', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXwZYVk6FiDzsdzBbNQ', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNX2RQNhKkBgbnV13Cja', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89BsnWpNoQeQ5asqfmr', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89GhyoGzV14LuWRQ4vU', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6hoza5729JZa5nt6Jk', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuH7zesM6vnXczr2jSQ', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gsKhuBPh8Mg32cGyn8', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXMkBWXnUZLP6BBGoL4', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM892DPwu9SDpWRjnisUc', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGZYwcCw4QrB3exxqNQ', 'msf_daijb', '192.168.8.171', '192.168.8.171', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Rpdt9UhECddWjmHpNc', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hNJsbw5ngqLzZsdNfr', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SKd3rEPKm7JUH2eDGL', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuXcaWFC9i2N6mUhvtG', 'msf_daijb', '192.168.3.21', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMH9NJbREqZjnq7msdQk', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcU8Ce1eyYxH39NCHdXN', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXcEmMudXLaDZwowzmv', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89c2kw7TDNi8DCbdfWx', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXXQa5T1qkAGk2GPbdJ', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hXyGArK9sfEeQxkAy6', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuM89wMY4wuwkMuWtmsG7S', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUHs2aaCv96voDHQRpc', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsHhUyVxbpriM7Mn94SU', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHECVssrXA9jf3KS2ZN', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXh4xeNFCvzAPsMWPvY', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNY7Dw4fKcu3tXV5JPfe', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Sa7dhcENYM8x3fKQiC', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN4xMucSBggdiDhN9iBi', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuCHoNQjRLNao5JULHn', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsHwyZMLSsdxBb8QpFtL', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNYC48M7wJVTqMQcrnpG', 'msf_daijb', '192.168.7.174', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLoug5rjVDkufhQXAYnC', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXC5nwcZ7NWVSL6A12p', 'msf_daijb', 'ast_8623fd4b8ea8f369edf9c3d22b20e227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHp1rs6AJK3MSW8Lpbi', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUnrCHKu1habkkYkpiL', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN582JBMR3sTbsYTGWUx', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuMxBwKxnXCUSvPb8b2', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGeP8tfYk1G7saWXEX2', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXSaNnzQA9kKv6iqCUg', 'msf_daijb', '192.168.9.227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpAAfi7LGY9WBB9qkE4', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbeu5jAqa6kN3i6MWmDr', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuhGy5ARWtrFkcZpjBW', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUxWarF8NtQVQbdsd1a', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5d1Tt779RwGq5icuNg', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNXrjMDHUa7p43iSdCDn', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGp3XTan7C61XRbe2pG', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5ykaPPDZAhajwx8QKpk', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcun7AMd3CVGCaY7P8L8', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLq5JoqA6n4guGL8z8rt', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfQ4tsbGCJqifdcsA7a', 'msf_daijb', 'ast_152e79212323dab064740b3865cbf25c', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcurwMe5et5g9QTewXUk', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5nfrT2LWcmAUvojhfv', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMNY2PjnChwJdwhZXjzX2', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yqQafgArHzgmsfxiyN', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfZjHSWVZVfcKUhyxQp', 'msf_daijb', '192.168.7.75', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHK2hALUCkZgUxrzRhz', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvMvXLqLye9pMzvHvNU', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLqKoPgXwpqvjk6mfLJk', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcuwmYvYGZg66EPCVvdN', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6Hf29n2cBEqSU566Ze', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsHs9N4sqC3YEmCsFrji', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHUh5jFhZwPa8ox7E1E', 'msf_daijb', '192.168.3.92', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbg4iT9GBf49HH1yLMJY', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvXauukaLpyi1r1Qifi', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvSkidHxfEZmBvTrKX6', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLM68qYLp1v9GhJzFTtk', 'msf_daijb', 'ast_77aed692ac257e3123eebdd1aff8d136', '192.168.8.171', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCkC387pMeuDKPB4sXN', 'msf_daijb', 'ast_ed0b8140107da1a425aabaefb44b1362', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJ7dwvFgEpn5EyVw4Ba', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6TKQihFyN4j6KACtrt', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJhTJuTz1yfh2SJqrDv', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMcvcR7CDC2RPeqmYy7pL', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCq2EQaS3FKA9JidGfz', 'msf_daijb', '192.168.122.250', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbepFXtNxR9x6tAoxN5E', 'msf_daijb', 'ast_d0ddd61c10a3927a5947af1d232ea25e', '192.168.3.116', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgKD2ze2hqP7knc1YkQ', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMFoE7G3P6yAMA5NGBz', 'msf_daijb', '192.168.8.171', '192.168.8.171', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcTnsrspWpadFqg242vt', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJSxj468yCRrYfgAen4', 'msf_daijb', 'ast_c2af868e9e21d31099125d7cc54aab91', '192.168.7.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJs7hUPDPAVagHPxeXA', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJXnvLYkenqoNbDj3vg', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbf4k7jkoTwBwMwSdZX6', 'msf_daijb', '192.168.3.116', '192.168.3.116', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMfxCXZ7o52tUmoAFw6', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDAM1YQtmcxwSztrsGU', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr3emV9mHZ3weW9TrgpQ', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcU3NSjCMsMs6KSejENk', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJcd7d1NLPFkCWmHT5J', 'msf_daijb', '192.168.7.195', '192.168.7.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDL1Q7L88onq6qyyfZi', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsJnHWBvbha5drMrQFNY', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gNLYCRhbZt15VLvatQ', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMvSnNvxqrGixYRqTNx', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfUu6A3ssuFfVZARZGC', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr3jbgSDuEeMbL51R5y2', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUTXR9VSHKvpT4NXE7r', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsK2n63JSkMKUL8V5SpQ', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8WgADjdEvtXTVfNuwE', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gCg9dWUEP47ReFonbA', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfjPg1RivgVVyKo6ki4', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLNAwNEJotdWZSK4Wepp', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gTAjUtKHAHwuQtUz32', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDfLBFAasBScQYADGAC', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUi1zzsHL7Aevq1CRZi', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuMsKCSUcDg7Y9MyyaCF7e', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gHWLuy5uyU4FZoNBjn', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajG1EY4Dh4qFhuHgbSx', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gx9uBe1Nimcrx9qNvk', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbg9YeRioLeZE6wWtkTA', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDupm6YRuxgStJntTc4', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8gLYnerc7iR7LkViEU', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcV8AyRAMk5EP4SizRJp', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gXzvmLvxkhtjLS3PBe', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqb5ipgkTPzR5ypZcoNp', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5W6jCEEj8vgtgd9uFT6', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvND6q5GyEa3aKd9Kjv', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgQ3EH6ePRo4ai9Zwu2', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7gnVWcin1XwjD74iadW', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7h7pHkZEjubWWoExBDz', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7ghfKLGAKwXnPBXABUt', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcVNfZGYCnrUDYDMfckg', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr3z6GHbkHRbRoqe6HQt', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbLDQY8JSmevTbCHzpg', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7h2z6U6d4KBZgshPn5N', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WBZPWhLpX6qWYhTebi', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hcoTTJvqU5BULWJa7i', 'msf_daijb', 'ast_82773bb9da34f802e08300150cd9e101', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvchggT821ot46FpXBn', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVULQ4eaZmkhbAU4yvQ', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hCeV31rRW1TLinWaNc', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hT94tPhUHFHpVRBmpU', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hnTr2EACeu58BbRNQx', 'msf_daijb', '192.168.7.205', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WbiMvzREVAZeARFeLp', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr44vTa4My21NdmBegZW', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZw7grPCp7aHZ1dXAv5W', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbahzPW9VYtkwMpyCGY', 'msf_daijb', 'ast_e6d915f4ee9084086bb4611f5a039213', '192.168.7.67', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hHUgKUU76RQAeL4yXE', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVdzndZovxabF1ZBnDe', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WgYZDT2v5aWU5xp3VS', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hhdejmYX4V8JG3ryGL', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbqCaEszYL8bR8TePiQ', 'msf_daijb', '192.168.7.67', '192.168.7.67', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZwHMEx83Um7SfUcHiNk', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMknPp1jUfSqJhLif5i', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5CrVTp2jTsYhTzpuda', 'msf_daijb', 'ast_ed0b8140107da1a425aabaefb44b1362', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hsJ3JgmtFK1x78ymZa', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrW8yxLKW2X4GCYpYB7N', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XGMvCfLhEU8FYmiqXn', 'msf_daijb', 'ast_56a0348384394f1618c04da2012d845b', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJhjtPhv1a5vEm1hFbN', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5NWt2jG6ehSMK5whvp', 'msf_daijb', '192.168.122.250', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLN1GyfPaXSgfnTyPrXa', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN53C6ttoNH3f3cui7LL', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5y16dq622MsEWeENjVA', 'msf_daijb', 'ast_eb64ef168af1538e135ab251196242fc', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuN7hx8Eb9PZqixn2gYAiC', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWDp9cn7i7UD2UN6aFz', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5HggkGeR4HVXPYPJnC', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yLRQxvUkjX1pLQcL5e', 'msf_daijb', '192.168.8.153', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XMC7V7xNpt55UKHEgQ', 'msf_daijb', '192.168.7.169', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJsQGxd9Nkuotc6p3tc', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVipyv2RcYzY4w6kBNG', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajRfd6yT4Ff9MkNoPkC', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5TM5KBsnF7PBEdW75S', 'msf_daijb', 'ast_4ded28ba0ba8f737553249f72654bc9c', '192.168.7.100', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6sj2zLpbvWrdRgK4WdE', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hNbT6B1nHFaCtaUn3J', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajWVpPS4jr56BfvMntp', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKY3qEJ4qWDNVzTHF5a', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WmNkVuebfzTJ1WNSe4', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVyKZmQGfLENYhjRNp8', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5hqfAZiq2MDf1GBJXJ', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5YBGbeVTqXL1AB4WE4', 'msf_daijb', '192.168.7.100', '192.168.7.100', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6sosBdHDc7GaFbrcumr', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5Ww394psxrpLwrbVEwJ', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN5xLF1wZsob48mtrVyA', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKhiDoDJCh3G9qYQ3Np', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hhvEE1UWeuMWakiNdn', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRak6KBNeNWzxhy8jGawA', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWPUYBhM5JJ6gKTDNZE', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN67zdaroEzQwncyyJGQ', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tPgYcVXPGAC34fXhpC', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWdy835C85XwA65ta16', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6NVDSEeHmenGPceViG', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRakB9Nf6zCbNeo4Gpz5n', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpL7sCDWNcf6zHTGC37v', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FUCLtq75y2aHx2i5ng', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XS2Jmaa4RJ1uPrqdq2', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tUWjtx94ra8rzD66xp', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6CppsKQvaptcYXXhR2', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNN6cyoHcVLYtckAFKhA8', 'msf_daijb', '192.168.3.92', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6syXaCCSyJ6TuSwji56', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XbghLVoRc7uZEwxS8G', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7bY26grjQM8NLgEXJQ', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FdrjTkLT9rTwo7pt5v', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hd62wYrq4VQgfD9yVA', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tyVubhqAR3opXUSVrY', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcTi3fbMu8zDK1kUVdnG', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcTxYFSjkBmT9VX7AqE8', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tE2A3aJ25LJPDaQuWx', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7mCQfc66bB22BmMKbe', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4G8quAW2YiL8uLPBGye', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4F8sZkzeMbNnzFrUVCC', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXhMY8cBCXQPcC4MoHz', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6u9AJAd4XbshUNZZJ9n', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcTsi4AH8WB3CfbZcS5W', 'msf_daijb', '192.168.7.174', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4GJWHjRFuuA2ZBUJ5Gt', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUD2qJ7bEYgyyHjr2fz', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FDhm3TG3BnjpBQ2tLp', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8GBaNMnC9egyj2hiVN', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXnBjR4nt7pLS7bvCSc', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6RQUujBcpEZuP83VpdW', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr4KR3RSD1oFD7XpKt1N', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUNhDs2pbjWsd8pxpyE', 'msf_daijb', 'ast_01db09ca3e2a777d706b754aae3a4730', '192.168.8.105', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJditwB18Si8W8TshcVW', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeDt6skpYGcB61941PE', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcVTVkYzpUStAN8uE1uJ', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Rjogs25YcDggpDjRDz', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8RqxwH1ZLUada7pWnc', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYHAu7pUygJ1PesGbLL', 'msf_daijb', 'ast_5295488e8c7cdaad97d00d6f652ed34c', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6RKeiSj18e9xZCVwRUt', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcUYMcRx3xvLmGyv5dGU', 'msf_daijb', '192.168.8.105', '192.168.8.105', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeJiJADSDs27uvgcQXr', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdoj8TTk8JYSxPRG1e8', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYSqHgjiLs7u3VxPPda', 'msf_daijb', '192.168.8.48', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6S9xfHK9xaHQpRwXQy6', 'msf_daijb', 'ast_6a75a6d036e5405335c6d9580c81012d', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8vq8e2hetxFb7PAugL', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVDqpDGjWzWs7PqPnUY', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6RuU5RwJuo3aLfJrDXE', 'msf_daijb', 'ast_56a0348384394f1618c04da2012d845b', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcV3Ln8hk4UpSEXBS2AC', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoS9QbFuKrqq6oj5XrKS', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5W1tzwn7TLGwrhcLrJU', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SQTF8h11MXFJCaCcQx', 'msf_daijb', '192.168.7.201', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVZAbM7CFNAeR61dP52', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeohTry8KRVnsTwxoRa', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKZ2eefx2821WpxmJBfv', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6RzJGiPvbPTXAarQcfr', 'msf_daijb', '192.168.7.169', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNcVD1AhcyRfeKtNGYpTS', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeyMrRtMgcKgXK35bip', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoSK4yppZE2ezTaAeecg', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZv2tKhEpErvGGdSuj9S', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WMDn5caBhvjAPnaStx', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SuSQqSh6uzvFjqZ1Jg', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVofBCV3J9QUtreJaWt', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SVHSR9cgwwC887m1Za', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVJg1VjMCavowKNxBdA', 'msf_daijb', 'ast_152e79212323dab064740b3865cbf25c', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3oyxD7nGocsJWdCjPHA', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2PkVsUEDRJA6bSV8wS', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWJeLuEjPht9rPueyQc', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvnN5FNMPCdmhwLwKV2', 'msf_daijb', 'ast_8898fc00e40eab50d4a5016279a831f3', '192.168.3.8', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WWtAeXoYtkcpEshFCC', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLozWH9C6uMKcXL4iwvp', 'msf_daijb', '192.168.3.36', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Sewpz4r48m5myCsorp', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVPWCnBxtBLkmEvWamn', 'msf_daijb', '192.168.7.75', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5X1sLMHVeTEHmn93e5v', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3p4nQQEtVDHFLYkHnRn', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWUJjU9xkti3WEzmmhr', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpVVSqwnzuoHUsL5LpY', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvsCGXpy4o3iXrtVide', 'msf_daijb', '192.168.3.8', '192.168.3.8', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2ZQtSPTac83kSXbwEg', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLp5LUReiawjZMFcHM5S', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrVtVNUweyjpRinBryfW', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZwT1dX3GqwwLKKhQWfz', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XBXivCj1e4BRdEASPA', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6sthNujqHhgX5XQBJvU', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpaKe8QQgWDEJnsdjyA', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ34Q4999gAbihynxL8Q', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3pUwNpXxuBLyUAU5nAt', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpEzrzZwx8ZT16hQ9Ng', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrW49m3rtLveKNdGymxk', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3E4Si4P3MRcMpt58Re', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6t9Bxm7gLUvMZJ2rWNL', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5XWrW43Bk1hxjKQQ2ye', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBVB3qpm22Fiuq9hKeQ', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpzUcYhV6UGxSQbRjiG', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJY5VpngePG2auvaTJ8', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpf9qQs2N6dB8iRC97n', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWZ8vkcaSV7zLAYLArU', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBuL2G7qRzKT3SsVKPW', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tZLwBQkkSz5gukeW7S', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3ZPDqtqmj5PfX4Jj28', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXN2kzmiU9kcJVt8ChW', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLqA917ciTf6r6FgYY1W', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpK34fXYNjwjhYTBvrBr', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuNrWioKKXoofwsz1dSy9i', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpjz2hKe3h37xdxkYGQ', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tj1KkKz7doyLkqmJQg', 'msf_daijb', '192.168.8.93', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKCj46Tc78ZbCJH3eV6', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXs1vhXQZiEHG39UbbE', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3thzyjJW6jAyDEYKcc', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBzADYaT7ajPsNR3iY8', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCaXeZCazU5KfY5x5E8', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6t4MmUf4etWQjNVJ7Di', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLqEyCQ5L9FWnvBE6wA8', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCQKBxsXXYo7zz8qiHE', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZU3f2DSHrxHKXmMadkC', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoREGT8rZMKHhia6PTgc', 'msf_daijb', 'ast_6a75a6d036e5405335c6d9580c81012d', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCfMqqfCg4VGVTdWUNk', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6uDzVT5gDCHeJJ77hJQ', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXwr7yz2FJeE5xh2zjr', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6tJrML2uhfkFD97yJfa', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLqQdaxzZWSLga2KDjTN', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6uPet1zuaP7Xx9CEVbe', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbD5WpFxH62Yzd5MJU7r', 'msf_daijb', 'ast_56a0348384394f1618c04da2012d845b', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRUm2zEQQ6XYCLj4f8U', 'msf_daijb', '192.168.7.201', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYXfUyCL2TXqsRVwnnC', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuToriWauuPdfSyVtvNAC8', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCV9PFL9D9D4pugQ7Rr', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6teB8TsNS3Q2WqJCuG4', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajBB3Fbc1URJsyk8CJL', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGjDLB8ARbg4hW45dfe', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDFBCpsWTDNtGvSRGR6', 'msf_daijb', '192.168.7.169', '192.168.7.169', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zWLiRb2JdiUbajHKXn', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCuJMfdDd7GnxXQC7Ax', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeZCt1bHGeFxPhKHbyi', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYcVgFewi3wnhM3WBvp', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6toqX2nboEDvAgPKhZJ', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajLqRpWqNfFCXpqEzba', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeisGaWWdq5r3YQQQGx', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCz8Yx5qJhgjnSwkWKa', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zg16zWFfpYNFRpQ7q2', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGyhv2W1UNuuBGgkq7W', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZv7iWyhRvTLD6YzU8J4', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDaVyxhyBb2facces1a', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuP6uJpgjYHtnhb8Deg6T2', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajkzQEoundJvfSZ2zLg', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDkANXdCYmrZEThmfJp', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvCYiGA3c3k9vUY2XSg', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNG4911MZpLjUZJvTLt', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYCv91BGyiS9LBYy35C4', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHPrtSo5tLydJtQYprc', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ29Fv26PAe4KcpoowVa', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGPtZ3HhhE2HPosr35A', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRak1Uz6BkqQYm9DBiBnY', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvXsVPzWLRPwEAiG83A', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYD5oPkCD5cyDqQ49sVJ', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNRiXZvaw1Ad8QQ3Fe8', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2JvJb1cXptDGftvjnp', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqaztdQHqiQ199u24QEC', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHeMUJAvw8DTnf3E2JU', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7GDExrQ12hM4eVzvhv', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMGtsik3PnnVxMM9CRxt', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvhXsxujhcDpt1oNvLQ', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbeyuvTJBnLmzY1u5ANU', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2ouUHmJdPMtEDAH8gY', 'msf_daijb', 'ast_9898d87c172cbef3568cb73c52727850', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNm3Jhm3fNpQS6aGrEc', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbAZ1yD55aq2ok7BCXS', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDVxNAVHVb2wy1mwsEQ', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMH4Y7Jxd9yKr1CEKEG8', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7RsdXmdNDXEiVb7j1A', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZwCX3ffRoAhVqZ4jKE8', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbf9aK2DR9XbtBrzBxfi', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2yZrrgXzaBmt4FPvyn', 'msf_daijb', '192.168.8.196', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDfckjQWrmrqcrs4fXe', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbVso73XoxUp7SHQo7v', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNqsVzDfLyEMG27qFPE', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHZXH1iKFXoWxjVfd9r', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7vroEXKTmzug2rU7tt', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZwNBSEafAMXPVQ9r7XN', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfeZUiy7F65Z9QFYMZS', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoReRRZ9dmHMRrBpBTRi', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDzwXsEyb9WcvZ3JG88', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbfYBfxmB9JhmHNXbRA', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPG2UQWjkwJ5PdqdF8L', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPMHjBfadYcidQcaanRT6', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq86XBoSYpxpoKswavC8', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbzrxooDuWxV4yYmC1e', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYEAbvSACxLLWaQ8R4RN', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJna5gAXhAVs4gZFejz', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfpDsHtLcGuSoFLf9rg', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPLrfgyMSXi2DZPBeGx', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRjFcqcFSsmNg7MjraL', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfEQWJg2q81q1nXkMpL', 'msf_daijb', 'ast_66f2649a968daeead93ae4af1a37262f', '192.168.8.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXXh9ZgwqLaVxLyEzzk', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbRLBJpr7xV6VqShoLk', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJxEUF5m4MKkiXeNT3E', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5y5vq7YdhxHBLZmw8dn', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgENqiBR2EyAvs4T9bn', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2z1MYiqLD5Eoe3Tvve4', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvSVE684Z6XgPYJiAEt', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfKEhb8eWiRmqi5Jkxx', 'msf_daijb', '192.168.8.246', '192.168.8.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXcXLr9ZWvzSnGWoQ9N', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbazZsk5V9Jz9gXpbdz', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvXKRNagEgwdDTrGZPW', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2z6Bk1HwtfekTy1VKng', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgUsRZZG52D1Qdh8M3e', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yRFcFP6SKvxeFxAjEG', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKNPSfNqUKPUr9NASnL', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbvKM1aYDWxmTNi4CEU', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfu44aLxHsKPdAtDZ1J', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKY7WWYuFcVU7jon9o36', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yauzpJKoWkrJ73HXXW', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKTDdwqT9uoRg4uiqvx', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zLgKrfnwStawjeAXEY', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr3pRsigWvEmY9zYyV7e', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvreCWR8y4bQXA2W9yz', 'msf_daijb', 'ast_f674e0a8967790cb3ddc4c33e68aa61c', '192.168.3.191', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbfytFroZyTjLT6Rmx9v', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnc5yjaVmahnf7DoAzXi', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYN16QH6fGhxDaQpzUx', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpL32zw3kw4h3TXiddyJ', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr3uG5198bqBUyv6XtGG', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zRWX98Qd3JXmfBivPA', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXHwi4pAYmVv6nkFg6c8', 'msf_daijb', '192.168.3.191', '192.168.3.191', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yvEmx8nXtQdboDX87z', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgZhcr1skccxEZEgkCG', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYnA4paB5EmgMC8czE4', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncLUKRscdV2VazRrBya', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zqfVZRV31NFuGuWv8G', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4h86sEoAjW1jj7woabS', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJCCefYPpH9wGWtMJ3z', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr49kerWyecRKTgjD5i8', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLLvUSyRaejKP3Tu8fbW', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPbgeXp8UVSD2u4UnF9Lt', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYwpTPVQSRba13DjnXJ', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncaxuHFTgGGL4m4XPRS', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zvVgqt6ibnCjCT5KGt', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hnkRWU6CFKJLWJGmnQ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMLdRPif4hP7B5cvfLc', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJH2qx11VsZt6SRuhCc', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuPr4Ear8ybLCqGHcGmUrk', 'msf_daijb', '192.168.7.155', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnckdHrAh3T6Dic9eBig', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKsNcN8XZss9ogdWqg4', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajgACxMJ72tyqX1UbC4', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW31AzGhFwmP23Cy5kWik', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMRTcgBGkHo411AV4VE', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hsacnvhsqjFARqqAw2', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJhBpNJ5uqdcE49hgwi', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6RVK71eEVpyrD3b4Dn8', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNBDwiYjtDvnedmN4CG', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2yqhA9v6qtQuzCNp8Lp', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKxCoeb9FUH6dcB5Epg', 'msf_daijb', '192.168.7.174', '192.168.7.174', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajvenoj99p8pKHe9ndv', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Ra9JJ6rBRPo2y8ccvk', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMqcb6UMAFrn8ctH4EL', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4i85CeJYvcy5eCUWNNt', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJn21ekhbS3Z3yhG66L', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvHNuYcfHeA6kQ5avbJ', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zB1wHkZaG4hHtZ3iwJ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5i8EeoepcmSsKy2htk', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNbNv8qpJBzWnFVA3wN', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLN67AwrCD36ccPWxFgC', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK58JsfbM3Tsq5sA7urQ', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXK7LnnbAKohLMfsVggp', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6S58TzrYGysTzWPy1pU', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5sndDitBobLXB49WBz', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zFr8aDBFrUe7p6c85v', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvT3J7XtepyzQFAhitY', 'msf_daijb', '192.168.3.206', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNgD7RJRynQTcB2iT5z', 'msf_daijb', '192.168.7.155', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SEnrZmmeAhMeMV5p7i', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXKH1BMWPgzXE1WxcUz4', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7WhppEF3owBYR8g89n', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5NoTWyC6F7fZdno7JG', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK6NmnvUaHN51UiKVu5i', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zbAui3dzE8RRWGqigQ', 'msf_daijb', 'ast_bdfe7460524d4ee20fd9eb590ca22455', '192.168.7.145', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPgBSpopAuMoXFZREsS', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZvx2TpHakPTfMnS47nG', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25Cazve8dKqTu5qgkMN', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7gNDP9UQzm5CGDnvT2', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6Sjn2GXTjjB2btkSD1S', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5TdeoRomqXcPZLMWSt', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXkgR7r6cHkGYxvF2nLx', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZw2rf6kCRyscBhycWvt', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTP1TwmNQCykvP17SZE', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2zkqJGxsMQxK5MMxWye', 'msf_daijb', '192.168.7.145', '192.168.7.145', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25HRCD6kJvFQj1PF9Vz', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQ6SpcDYz5RKayRpHzcA4', 'msf_daijb', '192.168.3.21', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8BMP5uAWZEk9oV9KLk', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5nxRwGGWDBPhFWb73N', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvBzeEkDWKHqumg2xo2', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTszdeX4VmTRsvGTqSx', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW311Kt8LiQCC9Z7zdiRW', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSZwXqpoVtXYMH9FExupc', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpKq4H2ZdiyPq2ExYXJ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8M1mepPsk4doeaG7dz', 'msf_daijb', '192.168.7.163', '192.168.7.163', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25sEZCK46592WUC9wYL', 'msf_daijb', 'ast_50de10994a155d25310dc827bad2459b', '192.168.8.103', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5xcpWBVsQ1HM6bhuLc', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvMf2ofSsW7jZcm9m6G', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZU8VDVtuYYhGMgu92tp', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW316A5QoL5nc6P3YC7a8', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpJcuh7FJKyfyQqU8rSk', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpQfFZVBKKPLewnWwfv', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTTqfEDz5oPhkJYfqhr', 'msf_daijb', 'ast_ad3e5bffefccbe3ac94dff7dd9209a0b', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25x4kUmfmfYyLPjiLgx', 'msf_daijb', '192.168.8.103', '192.168.8.103', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8qzwMa5yJYJmBqcWXi', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUiJaV7DKhat99i3pwA', 'msf_daijb', 'ast_ad3e5bffefccbe3ac94dff7dd9209a0b', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpK7trozzRY9eNNjVFLU', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJMs3ETdBTypvMyU6ME', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNLtLHTyFQkgJUrUrVW', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpppDynFjHT4nZWJwR2', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTdW3o9DSzDbQ9dne16', 'msf_daijb', '192.168.8.200', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq91fKvVKLVNCR2vjJpx', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26T3vBXMsE2eHw14jag', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJShEWvEs4PmkHX2VVr', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNWYirPCcbaZxKwbenk', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKHZFNvDniyY2Dpc3di', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUo8mmZq1Hzpy5FcE5n', 'msf_daijb', '192.168.8.200', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUDKQnMXE97DBcShS3S', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLpueRGEsQss1cV3sLZe', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WGPao9xW7WnLUF23kL', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26Xt7TyyYpSb7rYd8jJ', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKct2WkgX6dKKuzqeEC', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTorJMcVcKDhPFNHCaAT2', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvmp1DxXHUBThEUwkqN', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJrrCwDKH2TVsuEpVEx', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGTxGkuZr5dR4h8x2fwv', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUNyoMGkbKw6qTXpELg', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQLqVTnFTBC2kdPwrn8bz', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WS3yN5BsJLfzKL8r3a', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJwgQDfvxcsShpnNtPa', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvwUPnskef1MM5a4Z8c', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSpKnYR5futHTCym5xSXS', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTorPBon4vuHoCCCk8Zbe', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUsxy42SgtQmnzoAdEQ', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5WrCwnNGHGQQ7w3vqng', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGU36xC2TmDq1X4Vb56Y', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCVhTGjyJsfNqcYPg5W', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXKMqNdy1NawAqSWAt8g', 'msf_daijb', 'ast_36816d62aaf4ce558d4e9fcd1d685005', '192.168.9.151', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK63T1ne7YzREB29GJVE', 'msf_daijb', 'ast_9898d87c172cbef3568cb73c52727850', '192.168.8.196', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25NFPVZMzWfMYvvoYec', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTortAyUpczrGs9k1UxVN', 'msf_daijb', 'ast_f657dcf7c520b3c56c4262ef5253b72d', '192.168.3.101', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCurRh33iqj6yEGBfpc', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuS5X6hXdk7L3eEbhgc3EY', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEdLL2q8AJSp21j8Xep', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZV3dMcwg45EfSqtHRXe', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXKSfZvRd4BM7fN3jHHJ', 'msf_daijb', '192.168.9.151', '192.168.9.151', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK6Hwbe1xbmf4enmwVw6', 'msf_daijb', '192.168.8.196', '192.168.8.196', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTory1AmHEgSgoyfZ3Mdz', 'msf_daijb', '192.168.3.101', '192.168.3.101', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25T5an1yg75JNrUMwoE', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbCzgcyVfQS93o9ok4yE', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTorU214XYatD928HgxkG', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hTReNddTsfX2p83BBv', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dJBtjJDw1cTz9Hv46k', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTiLF5bq8adYE5BM39i', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY262twmEHTFxvAKHGjqa', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosPA9BaK6QkY7HGqMP6', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmghPpo6GDoVhaoN22Cg', 'msf_daijb', 'ast_4ded28ba0ba8f737553249f72654bc9c', '192.168.7.100', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDQqbPnjpQCmvmXY4iL', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hYFqf6F9U5TrjfbaLY', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTorYrCLzAGUd5r3qFMtt', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1diLs9bJLygC7m1i3qr', 'msf_daijb', 'ast_8623fd4b8ea8f369edf9c3d22b20e227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTxppvygBMsNhqp2Eba', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgs4DN1VazKbEeT8pVv', 'msf_daijb', '192.168.7.100', '192.168.7.100', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosYpXkVYTbaRm8Mx9gL', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26CZLL9WpSnopANPY8p', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTos3qN3jrN36kob6bknc', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FZ2YBHimZSX7saGUwJ', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDVfngFMVzcikh56Trx', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1doB4S3v2a68wgZGSzU', 'msf_daijb', '192.168.9.227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUYeBvByxWkzVJcw2dv', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhCNzVqxKMyNYLdNR6Q', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26hYW2uCv1GUmhdjw2Y', 'msf_daijb', 'ast_c2af868e9e21d31099125d7cc54aab91', '192.168.7.195', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4EoYndABdDj1gZgEtbi', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTos8fZLCU3dWhdWeA9wE', 'msf_daijb', '192.168.7.163', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FoX82fZpLgMbeCwgPA', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQbDpzZp5pENGW4PFL4TS', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRQDRC1ii6XpajtMfMJ', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUdUPCebe7AwKEAVRnY', 'msf_daijb', '192.168.3.21', '192.168.3.21', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhSsaMDoN9DD27G3cYG', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4EyDBC5QzQYuLQmMgtx', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26nNhKMpbbgRbdBJLBA', 'msf_daijb', '192.168.7.195', '192.168.7.195', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosTzLU2vn1AUwCpPkXi', 'msf_daijb', 'ast_bdfe7460524d4ee20fd9eb590ca22455', '192.168.7.145', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZVDHkBruRG4Z6gyQDpt', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqav4S7qE2obCKyUW15a', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRZsokvx5HMiEayUTeY', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4GDg6SxeEJk5jFvjg8G', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqNfQM9icSPYGRMSDAY', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGU7w9UV5SpExLz39UFA', 'msf_daijb', 'ast_ed0b8140107da1a425aabaefb44b1362', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FJXxKusinCge6wbHVS', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdJjxki42k4mzr9uckQ', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbFPDFfgmBEydfejbg4', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosdej2xA9BzNb3uWYpx', 'msf_daijb', '192.168.7.145', '192.168.7.145', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbQn7HR22E2nV8aiEh6', 'msf_daijb', 'ast_b74517821bd209ea1903f287835c3e9f', '192.168.3.103', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZVJ7wUKX6rUVvcWxcyW', 'msf_daijb', '192.168.3.92', '192.168.3.92', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqYKnv4wydDRvGSZ1Tn', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FPN9cNVQNcdU2V9ge4', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGUHbY3QJp14qzq8GGYQ', 'msf_daijb', '192.168.122.250', '192.168.122.250', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbR3bpav8N4sHWjrPyJ', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdPaA3AfiLUipmhU1u2', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdtZKjvMotxPnJxpQnk', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTordgPdSmx532fyNom3W', 'msf_daijb', 'ast_e6cbad26225372fb0255888db25cf97b', '192.168.9.106', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbaSVrLFPQrg8yfq2zL', 'msf_daijb', '192.168.3.103', '192.168.3.103', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqsea3uQhzsDDxcnc4G', 'msf_daijb', 'ast_ad3e5bffefccbe3ac94dff7dd9209a0b', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FyBWbaoBXWFFVJ4UgQ', 'msf_daijb', 'ast_82773bb9da34f802e08300150cd9e101', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqhzBUzBLp3Ka7Xfom2', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdyPX2NyVVNLcEWNowN', 'msf_daijb', '192.168.7.163', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdZEYc5u5XJcUcnapCG', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbkNNxRNrjiebCv5zZn', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuajzq7RY1ewGuwta3XMUc', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuToroLnCN1KFrvKpTvZLk', 'msf_daijb', '192.168.9.106', '192.168.9.106', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqnpNmSo2QTGQ35ECue', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4G41ht3Qs7vC5Qqcsq2', 'msf_daijb', '192.168.7.205', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWr3Jxcpe5Bh6sohuQMW', 'msf_daijb', '192.168.8.200', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoSUjNPjnbDUt7RFmSuv', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'ICMP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuQqbv2mXLcDvYYF41Cns2', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosDVkcf5jDveTSBiZ5r', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzuwcpUGcsKtiVb5kdE', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJePYVSg3uTS4jrEAogU', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrNdjkf6oZLtBVt8zwz', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJdUQMKdHPvtfehF2R3e', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrCyMBjsSNWzXeo2Cek', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJeUNgj8fb3r1ZmmjCq6', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3oedRywp5FDXCw2Vngg', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'ICMP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yAm2Q1FPYh8AVKVXnQ', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak1L6bEmM2qPcr7JskNL', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosJKwu7hQpLbHMjGxEU', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrHoYUCV7xvwMaLaboN', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrYJ8KaLAkAmqLyFoFE', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJde4jtYWm7iZJYL9DLt', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yFbDgTs5974zQs3vw2', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3pKGzFcjXzX5pKNxyse', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak1QvnXDxiRoZg2rS9Wx', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJf4C3iLyNCjdMEadzsS', 'msf_daijb', 'ast_eb64ef168af1538e135ab251196242fc', '192.168.8.153', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrhxWtVZXvzfVC4NbYU', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosiUvKQmpnQKQyT4wya', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmDo2PCEyLNKMknHYYAc', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJe4DiJqbB5nHSA3wD5z', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTosoK7bsPWNpGEtzdM8C', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yW5oXqi7vLuUBVj8Nt', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrnniAxBDXQcK7bvzh6', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3pQ7BY5MDaw2eEvXP2G', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNkVEgMDZeN6RPiHHax', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ24RijdmV3eNnuGFYLx', 'msf_daijb', '192.168.8.153', '192.168.8.153', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJe93ubJCrgCEG5bVcEc', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmDsraUhb1xjJahq6wKE', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXm6a6GPghiLH6Xxpn64', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2eF5ir5GCXzaN5ALPJ', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuR5yfkC6kwV7Ao82aqvg8', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmDxgmmAChZ9FQdNfLTr', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNqKRxoqFEn3FKFqgja', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4EtNyucoJp8xWVDoHkL', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJee35J3txEfuDcrr18L', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmE8MAL5S4jy94UTn8m6', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmE3Wy3cpP9ZCEYvDjcU', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmM4g7mXkVa7aJbVyXv', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPkTa5rbkmKSLUEz5NQ', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4F43NUY2fzxrALJv63a', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLM1JeFtCLKjKsPSh4k8', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2j5H1JgwnwwQHcijXv', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEDBMcY3kLP5tQ1LXui', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUJetXf9Rk11ujhPVXCaC', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEJ1YtzfRvo2iKYtw4L', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPqHmNKDSMjPAPnYUX2', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmgPTFbzUsDtszmja8Q', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FigvkCx8kGQmifPHEY', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMAy2poRhWZDXEXos3N', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3JtdzWziwqZBkRdXaG', 'msf_daijb', 'ast_927ebf7f2606b1a7ff7f7432e73549f4', '192.168.8.67', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmETfwTuto7cvNAe1jMa', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2E67JYzrEUGSkMNLeC', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMWHoxdtRtCzpvi3Tdr', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3PiqGycQYFW1fyBvit', 'msf_daijb', '192.168.8.67', '192.168.8.67', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmr3qpXDr43nXqrrNRe', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmENqkBTH7XCyYF6TLCx', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQR78MXXDWczwrbTGZN', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuU4FtMKK8BVw6JRZkW5Xn', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEYW8kNWUi2sC6Ba8WC', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2Uah9vqu1i6vWz3Y64', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXn6YRfu4tqHd1cVXZsW', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3opHpYs3SS3Qrn7cayv', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEiAXKHjqtrkqwGgvoS', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3osohGgpWKE9HgyvTz', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRLMb81F6W7UcwerFbrnU', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQVwKdz8u72wmn91fhz', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeUfGDNbaeGEn6UacCY', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ2tjfaDvJymq48hqXqA', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajbL1ftgRSV31bTvC3S', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9BcHyeUhGcKHCihWVe', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3ou81qKf82TMghfAz8Y', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoQymsHUiJY3sEoTiGEk', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEsputCyD5geVnMoj6g', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnLUwVs5qt59UgGDCfi', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeZVTVqDGEgBc2291MA', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ39EFRbmMm1fXuLWjH2', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9bmGPwZ7Eg3QpSVWEk', 'msf_daijb', 'ast_afb1d44ee125fc43b1d696d565b958aa', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRPvqhmniW7bNRBWFyr', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnW9L4nKD4u38XMKzxx', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1c8ZAkscNhqERDg6U24', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBa1F8HNhcffjkhFio2', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRajqpbXGXUDisVN6bPVJ', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFf4UdCauMo9rZZHVQEt', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3UZ2ZSE68fSqbWkKsW', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRakFyZwZbtBnbcypPPEQ', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9mRexrnURVw4fXcJXz', 'msf_daijb', '192.168.7.25', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRZbEGh25gwV2GGd4H6', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cDPN3LE4JFBF9DesAg', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEo18VmY1JdNi64cgPrg', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBeqSQjzPD5cZgEp7we', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFfJyD3xkQaPh3KvAbgk', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3eDR8MTTKVLVSbs8Ak', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7M3SFK1gd7Hta3ZKrY', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnA6kS6hFCo9iNMhqu8U', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEoAntLTEfpCbjuhoC9v', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cdYLTdJUGJuNkwSrun', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRtv1QXUp4bGKxSresa', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJC4zQq34oB9LhHxc7gk', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2u2F4TrJaC4GTQgwCc', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoR4c4ZwKz8Tp4j1GfPN', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnAGQpfcUZyyc2CnxhRi', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq7r2bx4hnBaxr7JuikG', 'msf_daijb', 'ast_88145a6a6e733b5033fb89c69dc2f5d2', '192.168.8.179', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJC9pc7VgUmZHXDWAWqN', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1ciNXk5v9rirCgV1G4Q', 'msf_daijb', '192.168.7.155', '192.168.7.155', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEofn43CvmNgGhSy9b3e', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoS4aPySiBFR9yoXyTAp', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoSEEnYMwYSF3ded6FU4', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2yrSLvTzAc16NxFLME', 'msf_daijb', '192.168.3.206', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCZyaXnktjd1eqDxWaU', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1d8XWANzZpnaLJCoFoW', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq81gzWyw9NQrVxQ2X3W', 'msf_daijb', '192.168.8.179', '192.168.8.179', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnAbjboSwJMdPKtyCJ2C', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEokcFKfYSy6DXNWhzCG', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBjfdhCc4oVZPbnNX6G', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3oZoEhVCPeoaP1UwPY4', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3Q1QmDYQ8fjDzg3L6L', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dDMhSqcFRCXADkMex8', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBAztmFQyn4h6ev7XQt', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJBpVpyfDkPuWDXKvvEt', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2XbyGpjjRCY8mZeoqVi', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8bWMWCEvXJUHRCwK5r', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCeompFNaL2xUkmWuj6', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3ojTdGQRkqdU2ra4BqJ', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3Uqc3gA5j5g3vDbjEx', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFetpEdffzcKxuiCNbwe', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2XwJ3xaC9aBv5Fq3S6C', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBLfHLAeLxtakW1EKi8', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJD4xkEYSzJ6gcNVJuUC', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuRq8mAk57UHi8MwGJ47P6', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCEeoPxJAMyEM93iuyz', 'msf_daijb', 'ast_4ded28ba0ba8f737553249f72654bc9c', '192.168.7.100', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3p9cbghWAohCAUHrBaQ', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRz2nBE2VFRSNChGTPe', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFf9JpV3X3PZoPUq3oPW', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXHCZiK6nZLfUaLZoYt', 'msf_daijb', 'ast_6a75a6d036e5405335c6d9580c81012d', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCKUzgQuqxPBB4bHK8c', 'msf_daijb', '192.168.7.100', '192.168.7.100', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubycmmuuRojaYyD86Hz5e', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2Y6xSXVRWm1oj6vAEPS', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYCkUccMkMFKSXhsvGtp', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3EM2CJK2wqqa9avXo6', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkS4ryTgeAqqPC8EprYG', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3pESnyA7rQ78zPqQaj2', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubycrc7BtRRAxv33drPEG', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCjdy6hzFvSuJgK5Jsi', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDAdb2epmDPAfKbiGdv', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKXSrxHEL9kAZ8RRgbr8', 'msf_daijb', '192.168.7.201', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGv7ASxHbpisu5r8UZeQ', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnABadP9rtPZfCHFQJH6', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3KBDUkviYFnQ58Uvwi', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoa5pBj8PFDobLBnnuW', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kucip2oXFiLHcF7WMx2Yek', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3jLBu418WKWXgrGvgp', 'msf_daijb', 'ast_8623fd4b8ea8f369edf9c3d22b20e227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnAMF1x56FaPYr8LX6aL', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKY2gKGSdvu4AutEbPtU', 'msf_daijb', 'ast_ad3e5bffefccbe3ac94dff7dd9209a0b', '192.168.8.200', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVJCpUAPAbwWrr8brdi2L', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvGpqXCqBuhnjhDbMwe', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDFTnK7SSoo7VF9GfnY', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoev1UBk4qdkRFjMC48', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kucip7diYAwyCf4LHVawoN', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3pAPBWcp6jTMcPqKqS', 'msf_daijb', '192.168.9.227', '192.168.9.227', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2XgoU7CM6nx5bVCNEeL', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYCLhqMsJ5t4ZjKiCBi', 'msf_daijb', '192.168.8.200', '192.168.8.200', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvc9cf3HvHMa3PPpxY8', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzozEnc2CoDHXiwuanec', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYCqJotpN2qjPMdRUg3S', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDanZSwuBBStnwKWGP2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucipXngxU2PAinTuDNwYU', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkR4te4BFyit3H3i84kp', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'ICMP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2XmdfPexnPN2RQjvdnx', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzp9uBAwSAQ7RNnzhawr', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYhKsY7ZPeMjXGb4b5S', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXGvgyowVubsmWsJwPMgk', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYCzyCTjbQ2ZH1UWbULg', 'msf_daijb', '192.168.8.93', '192.168.8.93', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDkSx1s8YNGnSnQd4gG', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuciphT5XPFkMYg7kJVjqi', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuSKYrzG72nkqBdB7gBPNg', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJ2YG6dAT6L3cfoEVkk', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYE5mj9hbGjvZkUarfGk', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YBndox3CMRkZ2TidY4', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkREZ2d6VLuhvvtoEs44', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'ICMP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBzSo2pP7B9d5h7u7ua', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDLHyba48QD4KAgq4wA', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuciq2mrfDiUjCTRSUjLSC', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFC5GzKGznmZZucfTX4C', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDR8At2fozd196EPU5n', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzo56eUySHgk8dnvSQ1n', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YGcq6QeswqhNx1H2gg', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hCw4XFnR6RgZ3VMyk4', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJ7NTP5n8gjzSbLntuN', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYEFS7icpdvkTQKfyTZz', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuciq7c3wgLAKcQFN2Hjap', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hHmFoiQ6gqdNy2vNtg', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzo9vqmS3yHA5TiTzoAQ', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJXXRoNrYeoiaD4ateU', 'msf_daijb', 'ast_cab01f8d9876f44a7b0e340ac6e3420d', '192.168.3.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDqH9JKkDxgjGhxBTpt', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCVRxja5CjdJ3EPFWoJ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YX7QwnVvj5XridxE8Y', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbkexSfJrL8soXcwPwE', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucyCTAW6ob1YAvzit8sep', 'msf_daijb', 'ast_ae4bfa93c6e4bc46e970f84c32dfc6ff', '192.168.3.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YmbzoALyWKNLVGdRaQ', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCaGA22gtL3Es9vouwv', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXJcMd5qUEFDfQ8c9Ho6', 'msf_daijb', '192.168.3.20', '192.168.3.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzojkCkeMkS3hFBGubCk', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4hxQp5PKZS9BzMPPa5e', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYDv7LanMuZ6g6dVjryW', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbqV9j7vXvYpdTAVo5r', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucyCXzhPGCh8aspeRhGoS', 'msf_daijb', '192.168.3.168', '192.168.3.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YwGPN5aLh9FzLMkDse', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVYELGK15SKXAQEFDXric', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzopaQ36yS2Te56pTzMN', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCzR8SKmJJ6xzmebuh2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXK2WbW8YeDHPXkKwHYC', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuT4i3F1MqwF2Z8pGvwyEG', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncFe89QzwtcYm4tHnpx', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDchomBzNkXBYfPnXyvY', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzpEjNTQ3qzXNCiYFz6U', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbLVz2NESN59fuu9QC8', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2Z6vmvzohsy9eBSs2At', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFD5FKinNytWuphCAJqe', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5D94x3xj4HmunhgK12', 'msf_daijb', 'ast_a94daa4062cb904a523b1b4617259c4e', '192.168.8.133', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXXKCAz53n1Q7HBbR45qS', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncRJWiLEK5SSQuyQb8C', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDcndxUSzS7bVVKL6P5A', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzpKZZjrfXawK2e5pPF6', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY252vcMiuG91aFEkZx48', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHP6N5qbWPkUBjnkWSq6', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXkr5WR1qew6ScmL9aeC', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgSuEwiRB2Fs72jLpkp', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5HyGEWaQehijiFEi9e', 'msf_daijb', '192.168.8.133', '192.168.8.133', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVaQomsudq75Sa441Sue', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTyxY24f1v9L8aq6piqv', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBf81tyvNoVqmzwfXK6', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgcZdWdeYD5kkspTd44', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPBCH8485Lt8ZiJ4qyi', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXkvuhhUTLXWPSgshynp', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY257koeBWwjRX5AJ8MCk', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5YTr5tRTRwZDUsuubW', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVaVdyANFWhVPPybZr4G', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTz3NDM7dbjk5QkeP7zY', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY24sGDnoftxBgbPfT9kt', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmGEUqJv4uAAkP3waPJ', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBjxDBSY4PunbvVDvTi', 'msf_daijb', '192.168.7.8', '192.168.7.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK5dJ3NM392MW3QRUJk8', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPbMFYMCVJwrhL1rqip', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25haAdPpitK8rd739F6', 'msf_daijb', 'ast_8dbc512f5a4cb3ec161b7168a4ac2391', '192.168.8.134', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVaunwafKvfZ7XbKMqoN', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTzHroCVUeWyutXH4KSQ', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVc5RfZ5wUyLM6WwBRt4', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVazd8s7wcFy4MWrvEwz', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK68HD56jEaqAzwgphdr', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmRtsQE9S5z4QE94NgY', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY24x6R5GHaYbdRKD1YuW', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25nQMurSQUj5gYebYPi', 'msf_daijb', '192.168.8.134', '192.168.8.134', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXkmFK8ZDyLgVnqnbBVa', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTzNgzUx6L7PriSpcib2', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25Xun4UbMhVFCn1vLwr', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVcAFrqYZAZkHvSUjq2g', 'msf_daijb', '192.168.3.206', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTK6D7QMZLvBF7psEP6nU', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFdp1hwhg7txgAi87R1a', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmmDeY4cATdqhvKHyH2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXm1jtyw527vLGcRGNwS', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbVcJZsdhpSjK48Gdqi', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTzdBaLKwNtdhCDTHv2t', 'msf_daijb', 'ast_5295488e8c7cdaad97d00d6f652ed34c', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZTYfrWgbmPoeaE6EErU', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmBQHYrJPJkDvTWPBEg', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFdtquEAHoVNczdffpAC', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY25cjyLwD3HuC2hZUk6U', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajyaeWH8RhNimVit9NFJ', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmvt36yqXeTjMmQQmaG', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbfGh8ns51GcxuDPS8x', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudTzi1mcnZ4V3e28zrKBW', 'msf_daijb', '192.168.8.48', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YSHDfKtF8fb2o6Ppyv', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZToASN4SpB3V3ziuSJL', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajykJtr3f4ZYf9ZyGAYY', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzL8FqFxqiSGw2nAxat', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY267j93gu8rNrzEpq8zC', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3tzaTyEVh9QBXwPiz4', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmWj4ggm7gQ1E9gcmqA', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTXyJiarVYEhBqy1VdSg', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUJ9c4p8ujXA1XzFqC4', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkQuEFVG2cY49dCd1GTa', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26HPXcc8W3Cke5uwwHS', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPR8nx292Pff2n4kUmv', 'msf_daijb', 'ast_e249002d63b2093900b5466cf429ed17', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YgmoWhjHuuRWZj52Rn', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzVneQBCCuGAassHkt8', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXmbZFy9NoGox45EBAyn', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTY48usK7Dq78ftZ42bJ', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgwtQeU7GajY4ZzhDeY', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRKPDuZ72W7skpLoGCg', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPVxzEUkhz5brhcJsvY', 'msf_daijb', '192.168.7.111', '192.168.7.111', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUTozdjNGvM3fP5NdVJ', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFe4WHo5XAgCWeUkncTS', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuajzzmp6vtJTjqYR8e9mr', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWXn1iEPSTDEsgBgwyAit', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTYocfRSeNApe7CT5cvt', 'msf_daijb', 'ast_4e7784ef87eedb324280479fdeee6aa3', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak15c1PPVz49nNLgCYvU', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRV3cUULPgwmQfRv4Vv', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZUxoALV4NUpicvLj2P2', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmh7YoDPLdmZRiR5p1wn', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn96n6hBs1gCNTHB97M2', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubjbg8jhp3mYK9F6TBq8U', 'msf_daijb', 'ast_152e79212323dab064740b3865cbf25c', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeJzseTNDTSM8FPTouJ', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTYtSrhuG3mEaw7ze25W', 'msf_daijb', '192.168.8.165', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuTZV8TYuQHjfecGmRqpgG', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhcXxv92jL36fxMAQqW', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak1VkyogaQ2DWVxPzYfa', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbkxvzGfT8j651zkEH6', 'msf_daijb', '192.168.7.75', '192.168.7.75', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9S6sq2Kk3r9kyMNhwW', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeeKenHpwq68RwZhQVn', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNapr7RzCTYCmYdAVHi', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kueha4vEBydhPtMj5BJaBJ', 'msf_daijb', 'ast_f567b9e1e9aa02d36334e490699a7ded', '192.168.3.85', 'ICMP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9Ww57UwReG6attw768', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhhNACbeQvT3Vstioz8', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNVzepyNWs8Fwd5c696', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3j3cQp58uuHKN9RXKN', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE2Mmciwg1pG2GQeDuAQ', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFej9r4kSdRW5Fs7FoeQ', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNff3Ptbt3x9bUAitSL', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kueha9kRUSFNzJJYziryKv', 'msf_daijb', '192.168.3.85', '192.168.3.85', 'ICMP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPv7xemq7x9KzKL6sfe', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUZ3yYCGBvBh97o8n6imE', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPzx9wESoYZGpEsfGpG', 'msf_daijb', 'ast_cb57620631d51483012b3ffbbb018ac9', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE2XS1HruP15uvFjLhTe', 'msf_daijb', '192.168.3.21', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFfE91mW8iyykDQNcCY8', 'msf_daijb', 'ast_e0658632d76f5a6707f3047b99e2ccf7', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9w63Xn1qcKpiWcj6qE', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26sCtbpSHC6NRYirjKn', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehaZuPtjKnxN2gcSey52', 'msf_daijb', 'ast_5295488e8c7cdaad97d00d6f652ed34c', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQAcYW9gAjPAU5xn57W', 'msf_daijb', '192.168.8.37', '192.168.8.37', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoR9SFrPwfiskteYq4Xz', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQ5nMDh4V8yDeARDfxt', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnA1vEpEdXCjmYSAHVyr', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE32RAzcbUZZasnzh6MN', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFfPoQLRN6AodsFTizqN', 'msf_daijb', '192.168.7.20', '192.168.7.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGTsSZd7EQ317sDQUGoJ', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehaejbBBwUYmyWXzDNDe', 'msf_daijb', '192.168.8.48', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEmfqPECAP8masHuk1Uk', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnAS5DEXhwAoVg3t5Vix', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmEnzibkMXVGhfrpFKx4', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRK6eRKB2uheYVdwrqE', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2jMrVYcwPNAccKa8uN', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE37FNH5DA9yXhiYFVVz', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQamWvSkahStbhga4rc', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehbEYxAQFFhfbHzo8AFz', 'msf_daijb', 'ast_9898d87c172cbef3568cb73c52727850', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEmkfaWen4jBXhDTJQdN', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRp5p84s8UBKW2uJFix', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEmb1BwjYhYMe3NNBcL8', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmExf7Afatg6bKhuN8FJ', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE3cEXypuFiTCfFobtPi', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2pC3n1Ecyn7SXs8Y3z', 'msf_daijb', '192.168.3.36', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWnAWuQWzKcmDSVyRdtsa', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehbQDLjKUctVUwqtExZE', 'msf_daijb', '192.168.8.196', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoRykCgz6Vf1D9szR42C', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cJDZKnqjtf854mDGKJ', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnApYvwrUhFFpqB6QNU', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2XrTrg7aTymyFLHV2wa', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE3mtvYk8cuH6K6tiggx', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRpNPcJo84bYiMc9f6Q', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEn1AAN2d7WRNAz5yc5E', 'msf_daijb', 'ast_c2fa41238e2191041614ae47e0b77837', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewxjmntSjU741hCk66dE', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuUoSPuB7HAud4wHViD3mJ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnFekDQUAHfCekieoX6', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2Y28FF2oqAbruBNbqEp', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cP3kcFTRV54tzJmfTv', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucyDnTce9Rw2n4DVb5G2k', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRuCatmQof1VYH9i4F2', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEn5zMeVEo6qJzudY1Dr', 'msf_daijb', '192.168.8.167', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewxuSBTMxqHsuM3qCtvU', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuV3oUy3R2ai4PdZ5wNzPS', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmh2ibvvixB9UtVYFcoA', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzpVDxJmttmmCgVAwBYL', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucyDsHovc3cdC13R8dfBN', 'msf_daijb', '192.168.7.63', '192.168.7.63', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnfoidhYaFivnNSSoGC', 'msf_daijb', 'ast_4e7784ef87eedb324280479fdeee6aa3', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1coCj2YXqT8o2c2ZfD2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnqU7CcmwSYpSDXZbZS', 'msf_daijb', 'ast_6a75a6d036e5405335c6d9580c81012d', '192.168.7.201', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewyVFYSaGcSmX8We7gxp', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbWANbHToYu3KkzGCVN', 'msf_daijb', 'ast_967d7dff6f029753984892911eb42337', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnvJJV5Pd2xmG957zi4', 'msf_daijb', '192.168.7.201', '192.168.7.201', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBaHpcXJhD5tx5Q78AU', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnkduvAAFr8scHz1CQp', 'msf_daijb', '192.168.8.165', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDbNWeeeXq2aRSd5bbYc', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhHDBnJZzxPKNGAvpF2', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1ct2vK19X3YjrXa84Me', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuewya5jj2tJ3BTxSBg67S', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dYgUag4ynrJTuvbFYc', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEoFd5curMQcYZqFMbJY', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnbfpmAChAjivyc5Nznc', 'msf_daijb', '192.168.7.18', '192.168.7.18', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEoW7fUHhQBrP3bt2nkQ', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDbTLqw79WczNGYd9zhE', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVcaQqFqdaXp244CXpmn', 'msf_daijb', 'ast_6a75a6d036e5405335c6d9580c81012d', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhnCMV4G6WrzKoSHD8k', 'msf_daijb', 'ast_ad3e5bffefccbe3ac94dff7dd9209a0b', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuewz54uRnaPbf8uyT2V1A', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVnc19YJ39u7NiHJFcbP6', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1ddWfs8gfPGFHqU9ehE', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEoRHUBq5ibSSDgLUPbn', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDc3ACvKTHmsz41S4nja', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'ICMP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajyfUhZb3Ny8iKeRhmPv', 'msf_daijb', '192.168.7.201', '192.168.7.201', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhs2YmWsn7Gw9iyqcHN', 'msf_daijb', '192.168.8.200', '192.168.8.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEoawrkkK5nGKsXRbBu2', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewzEjHzhoknV2ZpY9HJQ', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFdeMKNnSki8nWs2zciL', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncAovrxPGJCbw9LjPgL', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26NDiu4kBdchU1TWLS4', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDc7zQCn4yNHvsvydBtC', 'msf_daijb', '192.168.7.155', '192.168.7.155', 'ICMP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzATsGLjUXcPHBh4AHe', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVB6AhUnoJBekGjNZ8GG', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEovGdtamp9v7BDbpnVW', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewzjiThTVrLxhXMoVgC8', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncW8hznqzfrPEqWxzGp', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuY26ciJkSbEQrXwn6BXsv', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBFq63i2fNUdvaTfvZW', 'msf_daijb', '192.168.7.163', '192.168.7.163', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDcHenmhJLZ7pXn4jzBS', 'msf_daijb', 'ast_3f2b13a6c5c67d4c488387a845a3c7b0', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzFJ4YoMA82L77EcZSG', 'msf_daijb', '192.168.3.206', '192.168.3.206', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVB1LWCLBcbEoSopzj7e', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFdjBWfF4SJYjLnaZ1rx', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuewzuNrGNjDXnbBCtcUVN', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncfo6Zi5MrgGtgc5na4', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBkpFkTikvxJt7j2KTE', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmF3VJT8CaGWY9dSvXPv', 'msf_daijb', 'ast_4e7784ef87eedb324280479fdeee6aa3', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBWKfu5si9iUQM6M81N', 'msf_daijb', 'ast_7ee66f5a43834531308fab53db449925', '192.168.8.5', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzfT2y6Ra664EixQZBN', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudDcTKBLcXhjwiBd9rnUg', 'msf_daijb', '192.168.7.244', '192.168.7.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFe9LV5Y8rGcTUQJM1c4', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCNEwJRVz4kM7vZkTcZN', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBqeT2vLSXNFi3Gaibr', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuVncqTV8dJj3WAYXhCasJ', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFePq4vuyu3rHxAw2D3v', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVBfz4U175LYN4CBTvJc', 'msf_daijb', '192.168.8.5', '192.168.8.5', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYmF8KVjapFrvUyYzUvYY', 'msf_daijb', '192.168.8.165', '192.168.8.165', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuajzkHEFZ3FgW14eVxxKz', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiN3aDmuouhcAmVrhTFW', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCNKmVhxbkLm4kVJ21hz', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNv9dFGSvqBz5EoQ5tC', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiN8QR4NRbJ27bRQFrQ8', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuW2yvXMSNiXUprp7vNXVS', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCRTp28eDgFsVW5VWeC', 'msf_daijb', 'ast_342f81a994d8cddb29f2447818a22ebf', '192.168.8.178', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cTswti575V1iurL4cY', 'msf_daijb', 'ast_cab01f8d9876f44a7b0e340ac6e3420d', '192.168.3.20', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3ZfoL8mmKVcsqmA8Pa', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVC692tJBVJc6BouFv3i', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCNjvU8FgAJpnt71p1T6', 'msf_daijb', 'ast_afb1d44ee125fc43b1d696d565b958aa', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazNzypXj4cRbvuALxV2p', 'msf_daijb', '192.168.3.36', '192.168.3.36', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiNNtzukGe5Fx5C2w3qz', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHNvhhGgH2ZeJ5wfPeXr', 'msf_daijb', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCWJ1JbFuGfpKRd3unp', 'msf_daijb', '192.168.8.178', '192.168.8.178', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW3eVzcbPSuuZhmJiXYC', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cYi9BAgnftxYqPtTmA', 'msf_daijb', '192.168.3.20', '192.168.3.20', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCAyEAkoAu231jSpKCL', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCNpkfQiHquEji2ZNQbi', 'msf_daijb', '192.168.7.25', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVD1HB1Lwzq9VGxtQJgY', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCknb9y6x3ueoCFj7Eg', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHP1XtZ8tiA4EusCx3gU', 'msf_daijb', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPaoBWwNPaVYgd9sH5A', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiNTjCCCtKfftu7aVSzc', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1cxs7bTmCdxggT7gTWG', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkQz4SmieJ8U6T8AZfcC', 'msf_daijb', 'ast_8f9018eb841b52e6200be5b83330cb45', '192.168.9.2', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCP5FFG68tgUaBoC3c3a', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiNiDn3ajNSujNtDAeSU', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazPfdNoPz5AuVWYhRgDn', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVDAwZaGBN1yNvoyX6yn', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1d3hJsvNtENdWNfEret', 'msf_daijb', '192.168.3.36', '192.168.3.36', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkR9iqLdsfKHz6yFgTuS', 'msf_daijb', '192.168.9.2', '192.168.9.2', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPRgryRy887y3Uvk3Ra', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCqcnSRideKbd7oHWPJ', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCPA5SYYkaGtX1ijc1CC', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoEm33tfesa2He1ZCK2', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiNo3yL3M43KgCokj3b6', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQFSjncHrKo7J1WLUG8', 'msf_daijb', 'ast_cc3537da5fa9e83da62ce933e64992c6', '192.168.7.207', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVDRS9Re2QoDDQacCJRe', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dP261kqcc2Qp4qUTFN', 'msf_daijb', 'ast_f4629f7277dfba4a1139a62806625d6d', '192.168.7.253', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjagAQJJfaRMoL1vV3M2', 'msf_daijb', 'ast_152e79212323dab064740b3865cbf25c', '192.168.7.75', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWHPWX4FtaoiXusQUJSaC', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCPQa2Pvbd48MVVNHCe4', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiP3YZBRC6pZWgaPQF2x', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dTrHJDTJCSMdzP2rPz', 'msf_daijb', '192.168.7.253', '192.168.7.253', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuazQLGw54uXvD47w3tsQk', 'msf_daijb', '192.168.7.207', '192.168.7.207', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoQRRcou24PuwV6fzcG', 'msf_daijb', '192.168.9.60', '192.168.9.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjakzbamHG1mk9wU3SVe', 'msf_daijb', '192.168.7.75', '192.168.7.75', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9GSVG76Ns2G78GFueG', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVDWGLi6e6PdAEW9khaG', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCPVQDgPDJeYJKQuqbng', 'msf_daijb', '192.168.7.225', '192.168.7.225', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiP8NkTsonQyTWVvxeBa', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCFoRTDQrVRyqezNiLx', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbLoxZyb3AfMwQGxEXz', 'msf_daijb', 'ast_b13cde2e44c4c3f26f3680907d38cfea', '192.168.8.211', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzouQbKZb7csau2N2PVz', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dt1FiWXiAW5mc6pr96', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9MGgYZi4TSCw3opJnt', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubjb1VBS98Jo1adi6idwW', 'msf_daijb', 'ast_c2fa41238e2191041614ae47e0b77837', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCPjtoXm4MRn8oBYWoEY', 'msf_daijb', 'ast_4bd1c528006c2be1939ba0648e8185df', '192.168.3.95', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZ1dxqSzy9Pkv2bXePFHi', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbRe9rSCim5JmKpWdgc', 'msf_daijb', '192.168.8.211', '192.168.8.211', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9gbTgQAnq5zEjz3uPN', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudiPNsLKFeqCDHzGZdqdS', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCLdcjg2Y5qvfaXw7Va', 'msf_daijb', '192.168.3.21', '192.168.3.21', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubjb6KNibjzPRXTdeH368', 'msf_daijb', '192.168.8.167', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzp54ytUpUohUYsT9BoE', 'msf_daijb', '192.168.8.93', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufCPpizpDg32C5d765CPA', 'msf_daijb', '192.168.3.95', '192.168.3.95', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjcLnHyUyEHchrUof2KS', 'msf_daijb', 'ast_521707304666f3646c328ee7136adeaa', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuWn9rFrFKQA1ustb5Ahgc', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudxkP71LYSx383RwFFP6x', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbWUM8tpQMVFbFN52qE', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVCvSyitLKEjYT3LquXv', 'msf_daijb', 'ast_7091e54da623116885a2d77f8f55ecac', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzpQPm2KHDBMFrZdNnPi', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFdyg6WcuV5nZpZDEDJp', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSkzd4QRhX3viicroY9v', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubVD67NHoZgRZS6tRxhqA', 'msf_daijb', '192.168.7.209', '192.168.7.209', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjcRcVFwaut2egQMDRU4', 'msf_daijb', '192.168.8.195', '192.168.8.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudxkdbbBvHzpMsuhsvaYp', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YMT2NsGZYFeCsYqRqJ', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeEAgMzkXs2QJKquQkg', 'msf_daijb', '192.168.7.213', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzpa49bEWaNB9WQiVagx', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbbJYRMS5wuCRAudRyr', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSm5TFgtKCeLfYYQMwJY', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjaWW1jPSDEXugAqNF3n', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudxkiRnUNugQmpjdRUyhS', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydGm5cBVq92eAfMeNyN', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeoz3MD4K1v25nepCo2', 'msf_daijb', 'ast_571132e8d41db4d43e361df36638df89', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YbwcEF7cKVUgeBWdHA', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBpnQTu9jzKjRr2nKcL', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjcB7uQZjs6npCdiYE2C', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSmKwqYGAFRaW2K338kQ', 'msf_daijb', 'ast_5295488e8c7cdaad97d00d6f652ed34c', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydMbGte7WjSazauCn7z', 'msf_daijb', '192.168.7.174', '192.168.7.174', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2YrSC5cxf6jKAQpBpj2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZFeyeRv8HgCjujdjw16G', 'msf_daijb', '192.168.7.50', '192.168.7.50', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KudxkxvNKkkjC1fDQ4AB9J', 'msf_daijb', 'ast_c2af868e9e21d31099125d7cc54aab91', '192.168.7.195', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjabLD1r3tpwrW6NveCQ', 'msf_daijb', '192.168.7.158', '192.168.7.158', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjcFx6h2MYhCm2ZG6dAp', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFBucbkMmRajgFmaLikx', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSmQn2pimw1zSrEabXu2', 'msf_daijb', '192.168.8.48', '192.168.8.48', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydwQdsrRHtLCn3i7aAL', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydSRUB6jCKrXpWSmBGc', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCEwNtCE9xPTZTkaKMS', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2Q35MiAD1iPJv9LYJt', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbB9a14MfyqUHZBqSEk', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuX2Z26aeYC2HZCpFuJd2G', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kudxm3kZcDNQnRc3KbiaHv', 'msf_daijb', '192.168.7.195', '192.168.7.195', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSmfGcg6cyoEHL1DGjLt', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgXjSEB2rcfovxGuDuS', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2ZhTvdPaCYGxmETLc8', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCQbmT7TX9DMDJqh7eg', 'msf_daijb', '192.168.7.172', '192.168.7.172', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubye2EqAK2yUk9byFfyJx', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubydc5rk1xZWgRUMXsyZr', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubjbFymHWyMaFR7UjPqPN', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueD9PHMAr1T7wUhkzGW9N', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSmk6oxZEfPeE9vkq8VW', 'msf_daijb', '192.168.7.68', '192.168.7.68', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmgnE25YsuPueQiuaRMJ', 'msf_daijb', '192.168.7.189', '192.168.7.189', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCpkjsQXw7H5LvZV7Pn', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubjcg757KRxfGVAAytcuv', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueD9U7YTJd8iMRXgXpuHz', 'msf_daijb', '192.168.7.184', '192.168.7.184', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubyec4C9XLkddmPS4amMJ', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW34gddP5fm1wvJVojVr', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubye752Smef5A6RtoENTa', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSmzbPow5iAt4dhPWKwN', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubycMcwV8jKcVF5WNVzLY', 'msf_daijb', '192.168.8.93', '192.168.8.93', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueD9tGWsbhYgR9fJFcu36', 'msf_daijb', 'ast_30e16209f8633da22575f4e8ec74d860', '192.168.7.191', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW39WpuqhMMRtkE3N8eU', 'msf_daijb', '192.168.9.200', '192.168.9.200', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubyegtPRyxSE3iDMc9AVv', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubyeGjR1gt2Fyz5jtMAkp', 'msf_daijb', '192.168.0.8', '192.168.0.8', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhN3P4mBgYoGCBiVDPe', 'msf_daijb', 'ast_c2fa41238e2191041614ae47e0b77837', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFCuaw9s9chh2Ar73WYQ', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufSn5Rb6PhPmJ1Tcw4j5z', 'msf_daijb', '192.168.9.168', '192.168.9.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuXmhXhmdgR3jd9r2oc1gt', 'msf_daijb', '192.168.8.167', '192.168.8.167', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE3XQLhNHa83FqLG3VF6', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueDA3vuSWvusF3K9LjhLL', 'msf_daijb', '192.168.7.191', '192.168.7.191', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRei13PZksmf4WX2roA', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE1h84TGkZ4xTf2HkhyS', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubycwSJUM36mNrryBQnNt', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaFDKjuaAE2fkkJTpqWHW', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9FKegbiso2eZ8ho4rk', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE3h4jGHWwJs9VBMAHYL', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGUCmLkwh8QeuAuahsPn', 'msf_daijb', 'ast_eb64ef168af1538e135ab251196242fc', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZkRjYCKrBSUBbtS4bFwn', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueDAPFgaMPeEtpcqWyHvp', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kubyd2GVkoenMnogtiyBXW', 'msf_daijb', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE1rnT2ByvFnMJsNsWGg', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVaKyabT29WfVk8WT3m2', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9L9qy4LZPSbP4FMU1N', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUR7TNhsPU7qd4TkZpkx', 'msf_daijb', 'ast_afb1d44ee125fc43b1d696d565b958aa', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYGUNRjKrvVbUnpkfpfh2', 'msf_daijb', '192.168.8.153', '192.168.8.153', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueDAYv59Gd1RiiGgc66E4', 'msf_daijb', '192.168.7.42', '192.168.7.42', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydXFfTZLsvGUeRzKaRE', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVak8Z1k6ZUjDskEF3W8', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoKbELMHLTyy7ZZ7bTe', 'msf_daijb', 'ast_5bc0480c7874a1b5287d6b24cd93bc69', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucURwmKYTYJ3y5KhC9pFA', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9aeRpSBcAgRrpt2fTE', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVapxkJCiF59AhfmoSek', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucURCHZzL19iFZtPJ8Dua', 'msf_daijb', '192.168.7.25', '192.168.7.25', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqTVbdcLJ2oV6LtzcKA', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTXoeL1wGB3sJC7vNq9S', 'msf_daijb', 'ast_65382701a6474a82c280f21160e02c67', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZzoVFcuGWheormQeEPkt', 'msf_daijb', '192.168.7.148', '192.168.7.148', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubydmkFJwBvhWK8Cczms6', 'msf_daijb', '192.168.7.159', '192.168.7.159', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUS7Ri7NmfEnxyYHGcYQ', 'msf_daijb', '192.168.7.129', '192.168.7.129', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9fUd6toHm6NgkRb4br', 'msf_daijb', '192.168.8.244', '192.168.8.244', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTXtUXJPsreHF23TwEJ4', 'msf_daijb', '192.168.7.140', '192.168.7.140', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubyeBuDjEGLfa3FpLnmcC', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqd9zCXZfDdNkBz7QcQ', 'msf_daijb', '192.168.9.131', '192.168.9.131', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucURcSYQd5ZgKJ211vDeg', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbF7iiVnf3CtqHVbSPr', 'msf_daijb', 'ast_1677b61a454407478a05e392a4ced022', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak1ASCfr7feZjCGDkx56', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUScQsp8TkoGdw5Yd1S8', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9kJpPMQyMWKWfy9TkU', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucURhGjh5hFGjEqvZUcoJ', 'msf_daijb', '192.168.7.219', '192.168.7.219', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbKwuzxQLdcqfD39qYU', 'msf_daijb', '192.168.7.72', '192.168.7.72', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kuak1FGPxJjMEyg2BmKMDi', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTYJdVigxGcLy9fBjE3A', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWqxUmLN2PbHA3tAM1Ct', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUSn5GP3h7z6XavdjojN', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubyeSPoac7PSosjayTy44', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9q91fp2ewvGLbWhru6', 'msf_daijb', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUSCFuPqPLqCuoTpq1h2', 'msf_daijb', 'ast_e6d915f4ee9084086bb4611f5a039213', '192.168.7.67', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KueTYPTh19ZxCkuyajHdBn', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbumGzAi7nWTSfr4dap', 'msf_daijb', 'ast_ae4bfa93c6e4bc46e970f84c32dfc6ff', '192.168.3.168', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE1mxFjjNEfNQUwqK784', 'msf_daijb', 'ast_5f8c398db63104de1e9f0eac6210c820', '192.168.7.208', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEmqVmo7PkKbUX8zromz', 'msf_daijb', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWr899uHFkn73hjFToW8', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucipCTupdZeo51AD39Lwz', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9uyCxGeLYLDAX4GG3i', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVbzbUGdKoNvQGbPd2jS', 'msf_daijb', '192.168.3.168', '192.168.3.168', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrTTw37iV9kq1RRhQ6c', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUSMvHxkci22oTJuwozG', 'msf_daijb', '192.168.7.67', '192.168.7.67', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEmvKy5a1Rv1RM4YRCvc', 'msf_daijb', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE1wceJebbrCJ8nvRuRJ', 'msf_daijb', '192.168.7.208', '192.168.7.208', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehZEcHMPUsTkuTqjiah6', 'msf_daijb', 'ast_6384248039915629a2a7ee91d3d63914', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucipHJ776BLPUwz8ahk6c', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Kufh9zoQEjG28k9zSbpfCL', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE2h6Prn8kBuoa6pTVkt', 'msf_daijb', 'ast_50837c5cc89f1c3cf732cafc0be2b0d0', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehZKSUdr6Z4ArHmHGyqi', 'msf_daijb', '192.168.8.60', '192.168.8.60', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucipcctEve4m8jHpkwLh6', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUShF56b5SPgam16BQak', 'msf_daijb', 'ast_9898d87c172cbef3568cb73c52727850', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuYWrd8Kc2wrLaifGWpCPr', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnRK8nKhXUV6JbombpL', 'msf_daijb', 'ast_bc7671bc179debaccfde6a66222d38a3', '192.168.8.230', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVcKvFQTnXkaBaHZrdKv', 'msf_daijb', 'ast_82773bb9da34f802e08300150cd9e101', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufhA5dbXBshjA6pN9P4Lx', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuaVcVadyP1twQ5E8eyRdA', 'msf_daijb', '192.168.7.205', '192.168.7.205', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucE2mvb9EkRnKkQ2N1tuW', 'msf_daijb', '192.168.7.246', '192.168.7.246', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuZW2UsGeAmtc8L8qgtwTW', 'msf_daijb', 'ast_bdfe7460524d4ee20fd9eb590ca22455', '192.168.7.145', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucUSruTfWJoaWUQrBJCsz', 'msf_daijb', '192.168.8.196', '192.168.8.196', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KuehZjbT49Ay2EaRP14yap', 'msf_daijb', 'ast_b4a938e064701a1c4112b0256db2aec9', '192.168.7.213', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KucipnHGoqsRwxcwfr48zL', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KubEnayXMEvtfJyxSttQ7a', 'msf_daijb', '192.168.8.230', '192.168.8.230', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_KufwX5sGYUfpa4rG2pzbpU', 'msf_daijb', '192.168.9.231', '192.168.9.231', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:35:29');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Rdu2iSjvPKXjR8MNUBCYsS', '', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Rdu2iCFLXwggdtWthYXMRa', '', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'ICMP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_SCBd2erv5EE6rGrqefZQmE', '', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:55');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Rdu2iH5XpQJNEJTid65kaC', '', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Rdu2i7R9FV513Ua4mzxxGx', '', 'ast_590dc1b68a771addacbb07e455644070', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_SCBd2a2inmcRFrv1j811cc', '', 'ast_8898fc00e40eab50d4a5016279a831f3', '192.168.3.8', 'UDP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:55');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Sv82GFH28LFnXSZo9oo2CG', '', 'ast_1106dfeaf74773119d19a7af77b6530e', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:37:05');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Rdu2iMuj6rv3piQYYde9ip', '', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"0-9\"}', '1', '0', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_RduH5Xonh4wXrT3e4QNVVa', '', '192.168.7.236', '192.168.7.236', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_RduH5cdyyXZDSrzTywvteC', '', '192.168.9.22', '192.168.9.22', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_RduH5hUBFzAu3GwHuVVHnp', '', '192.168.7.42', '192.168.7.42', 'ICMP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_RduH5nJNYSnadgt7q33gwS', '', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_SCBd2jh7MgqnSgofaD7our', '', '192.168.3.8', '192.168.3.8', 'UDP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:55');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_SCBd2pXJe9TU36kVVkgD4U', '', '192.168.7.222', '192.168.7.222', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:55');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_RduH5SybQcKrG36p8rp6Lx', '', '192.168.7.236', '192.168.7.236', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:36:47');
-INSERT INTO `model_result_asset_session_flow` VALUES ('msf_Sv8GdFWh9d3uNMKEpVQZfn', '', '192.168.7.23', '192.168.7.23', 'TCP', '[{\"name\": \"1\", \"value\": \"1-4\"}', '0', '1', '2021-03-24 10:37:05');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQi9PJRycf2APnBFQaH6', 'msf_daijb', 'ast_03ba65b39f98379bd717abb3394c9a00', '192.168.3.200', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbMku6JHMrBCCpFxuh9Z2', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-1.37\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQhyius4PHqLW8LAHmyr', 'msf_daijb', 'ast_05c1b1ccc9788c03d145c14545c718b5', '192.168.9.231', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVfboPApmPNzq2EQVdZUc', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"7.2-7.21\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tY9JFnD5ywjsocT1AN96g', 'msf_daijb', 'ast_09d5b0fc058a0a7f9cbab8b064da4965', '192.168.7.42', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWGmUfxVZvz24qp7yGtWk', 'msf_daijb', 'ast_0e5371a4377339158d799df22007bfe7', '192.168.122.220', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdbx4TWGJaumNupoGFS', 'msf_daijb', 'ast_0f553039be1efceec6212506c3851e19', '192.168.3.129', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUvVCtTNBK4CFpCs7BMEG', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-7.19\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsEWX3RAcrNvCG7rTBWxg8', 'msf_daijb', 'ast_119b2a3a6371b403ad48a43629326333', '192.168.9.200', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALJqga6fiF8C5H8D3KN', 'msf_daijb', 'ast_11ae33c1d8bae431c4ced4c7998bd15a', '192.168.8.74', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.02\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8taNGdiMXp4GoRJBNVACeC', 'msf_daijb', 'ast_11ae33c1d8bae431c4ced4c7998bd15a', '192.168.8.74', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRQXRtjb4L1CZVw3BKug8p', 'msf_daijb', 'ast_11db99c1944b82f99b59ac9e79d9e63c', '192.168.9.89', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"4.26-4.26\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRSG6kVatVQCEg2odFhzRn', 'msf_daijb', 'ast_11db99c1944b82f99b59ac9e79d9e63c', '192.168.9.89', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsGV7qJH4BPZ85SMh1nghn', 'msf_daijb', 'ast_1e5c687da8f7ae63a45d72a4fff25cc9', '192.168.3.119', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-11.99\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsEG9CsYkyRyRDv9Z4KRiQ', 'msf_daijb', 'ast_1e5c687da8f7ae63a45d72a4fff25cc9', '192.168.3.119', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsEWWi6PV1vBpcLYm1HN5e', 'msf_daijb', 'ast_22cd8d05d95e6084427036c2ca03d8c1', '192.168.8.71', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"1.59-1.59\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsE1kxAxUoQcg7zK3DKu1a', 'msf_daijb', 'ast_22cd8d05d95e6084427036c2ca03d8c1', '192.168.8.71', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWXAjLtBFLXt87ZiLyD12', 'msf_daijb', 'ast_246289f025f6990457b5d296f2e6629e', '192.168.3.16', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"462.04-462.04\"}]', '0', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvW2Pe8Ldgz3F2e7Dr5MZ2', 'msf_daijb', 'ast_246289f025f6990457b5d296f2e6629e', '192.168.3.16', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZdA83qMgbdbG2ykeGPYU', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-115.44\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAYcELeH3pjeGZr1BTx3a', 'msf_daijb', 'ast_25673b7b1504f64369d555808a4304cb', '192.168.9.22', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_2GmkPVhTFm3rXh9vdjQg4Y', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:35:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUg87pb4RuFkw7wGt1Qc8', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-185.05\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkHGyCYxJytvENkoseQ', 'msf_daijb', 'ast_2805ff087bd87dc9474c2a5dbc333abc', '192.168.7.159', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUBNcPjubEjPgcBKij8yv', 'msf_daijb', 'ast_28eb57b433f203b8a645fb49fd8a7d5f', '192.168.9.15', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVArsmgf92dnU8Fv9G5tk', 'msf_daijb', 'ast_297b661dcb1219074e27eb93f9c533a6', '192.168.3.149', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbqCX3sadHZbUEnofAFmA', 'msf_daijb', 'ast_2a30741c85e580c2fab7fc6e41becf7f', '192.168.9.158', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUBNhDwC3rQz6Z1FGHY8Y', 'msf_daijb', 'ast_2a9b3101956cce54604af4d2f2457e25', '192.168.9.43', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"6.42-6.42\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwY1RgQRaAuHuGSy3qnY', 'msf_daijb', 'ast_2a9b3101956cce54604af4d2f2457e25', '192.168.9.43', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tas1PfT8XBepxJW1kQsvp', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-613.72\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALoprGrMoobs2pPZSD6', 'msf_daijb', 'ast_2b04c8c65613373414860a0eff5a1d0d', '192.168.7.158', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZNnXzoMBVjbTfkd9k42c', 'msf_daijb', 'ast_30c1bbafd7840aeb0f0a033d3d5ec2a2', '192.168.3.34', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"1.88-2.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRTFbw1fm5xc9zwyNfPKyS', 'msf_daijb', 'ast_30e16209f8633da22575f4e8ec74d860', '192.168.7.191', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8taNGiYYpGfxPqF1J2ibnp', 'msf_daijb', 'ast_30e16209f8633da22575f4e8ec74d860', '192.168.7.191', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-608.22\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tb7PPsTZKMxnpPrkxjDBn', 'msf_daijb', 'ast_30e16209f8633da22575f4e8ec74d860', '192.168.7.191', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbMkyvVZpTrncm5tTFYhe', 'msf_daijb', 'ast_312cd485d4a18a33ed55da2466624110', '192.168.9.46', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.4-0.48\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALeAThw8ScmyNyJSdur', 'msf_daijb', 'ast_318d07d30eda56cff66cd76f07ec3187', '192.168.9.212', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.6-2.72\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVRETpife8XnGVV3dnRQc', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-115.38\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws8p1cxZvHoZE9gDe19zLG', 'msf_daijb', 'ast_35077babfc249ac71be15bf605618eb1', '192.168.7.225', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRMoeqoCgDrCiwp9nAcBKW', 'msf_daijb', 'ast_360f74bdf30ebee3eef1036df0c1ca40', '192.168.3.245', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtwAiLnEXwSUvBQwCCUY', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-825.05\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZ8RCSMC4EtNu91GHtuxc', 'msf_daijb', 'ast_3661e9423c5b1eb1c0a5933cdba1fb0c', '192.168.7.172', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws9oVdqvpTkQqhMpTo1joE', 'msf_daijb', 'ast_36816d62aaf4ce558d4e9fcd1d685005', '192.168.9.151', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"1.95-1.95\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMujmZk2KAh4s5rJxybzi4', 'msf_daijb', 'ast_36816d62aaf4ce558d4e9fcd1d685005', '192.168.9.151', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdmcT2RVfmjf2kuv4Yg', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.33-0.59\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8ta7tdWM71sxqZCpdGqsPE', 'msf_daijb', 'ast_4365e790773de6533114e4f123ac0a1f', '192.168.3.206', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8taNGDZP7WyrqMa3kmNCu6', 'msf_daijb', 'ast_437dbe387ac95302a29151184bc42fc5', '192.168.3.12', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNJQgYpxtyTTr7DRW83YC', 'msf_daijb', 'ast_43f756e705e29a4c1be0e66fc4457989', '192.168.3.91', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUvVHieedvjnfm2nejkNt', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-1849.37\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDX17RLC8HMwDhFPsp2nt', 'msf_daijb', 'ast_46cabf010e2a22524ae2cbbcb57b0714', '192.168.7.155', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAJEJxq8iG7GpRKBWi1wE', 'msf_daijb', 'ast_470fd1d63c9660979bc084399e48eb37', '192.168.3.140', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"3.12-3.12\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsD2GX8dALPM6Waabhg9oW', 'msf_daijb', 'ast_4774f14e51c07c4fc017599db7f0f212', '192.168.3.208', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-1.39\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbaoGNwtwt1jQy3DHTwGt', 'msf_daijb', 'ast_47846f18ea0ee6b769262d2a764f61a5', '192.168.9.163', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXqmHqWLoiU1cbsw3VJ', 'msf_daijb', 'ast_47a73e56253b84b6a46dae5dfe49fcd3', '192.168.8.97', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVArdH6omBb1EHn9WatSt', 'msf_daijb', 'ast_47a73e56253b84b6a46dae5dfe49fcd3', '192.168.8.97', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.9-1.7\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbc8QK91QLPbbEfArf5vG', 'msf_daijb', 'ast_47a73e56253b84b6a46dae5dfe49fcd3', '192.168.8.97', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Hr2HW3UbG7rohbsxEMQRYc', 'msf_daijb', 'ast_4bd1c528006c2be1939ba0648e8185df', '192.168.3.95', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:00:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALZLGRUWm2N2Z3ktEmE', 'msf_daijb', 'ast_4bd1c528006c2be1939ba0648e8185df', '192.168.3.95', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-5496.68\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8ta7tszvxPj1co3JPuX4q6', 'msf_daijb', 'ast_4bd1c528006c2be1939ba0648e8185df', '192.168.3.95', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws8p2CmvuW7LP3J16p4nNc', 'msf_daijb', 'ast_4bd26da1792f1819bad6ee7ca87278ce', '192.168.122.112', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws9Z8P7fwo7FDYmu2Uizsr', 'msf_daijb', 'ast_4c6c0f16c13d8e7f308feb0ffeea7e4c', '192.168.7.116', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTSG1u2T1AQb7Q9nLGvja', 'msf_daijb', 'ast_4c6c0f16c13d8e7f308feb0ffeea7e4c', '192.168.7.116', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkXmZ3voMm8ki9PV56G', 'msf_daijb', 'ast_4c6c0f16c13d8e7f308feb0ffeea7e4c', '192.168.7.116', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUg82zPmyHaAXB7MLT1TW', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.27-9.56\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tas1JqFr4ZyEYMg6CrUnC', 'msf_daijb', 'ast_4ca8c12b970a89557e2bd5a8b0ba3c98', '192.168.9.168', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Hr32eikApBKCLVidrLpcWU', 'msf_daijb', 'ast_4e23876e3567d3f50eb0ea62efb452e7', '192.168.9.82', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.42-6.42\"}]', '0', '0', '2021-03-27 11:00:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Hr3H2onNXS7BtmkpX6hLv4', 'msf_daijb', 'ast_4e23876e3567d3f50eb0ea62efb452e7', '192.168.9.82', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:00:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQi4Z79WzyRkSxFhrB8U', 'msf_daijb', 'ast_5091c557bb073e8f79e4b1cd378bd428', '192.168.9.9', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvXWSLRFo3cg69x3z4bVKW', 'msf_daijb', 'ast_50f71291ed0d84d131b442e4f4f2a6e8', '192.168.9.205', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"1.7-1.7\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMvEYjnm9BfF6bGbP24FJg', 'msf_daijb', 'ast_50f71291ed0d84d131b442e4f4f2a6e8', '192.168.9.205', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbMkpG6zuEVbnsS3N8kQQ', 'msf_daijb', 'ast_51b97cb2c1a93fb5451419d1bed10130', '192.168.3.68', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.67-0.67\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWuTKVNSypT1m8ESETFJp', 'msf_daijb', 'ast_5410aac1859de1d9c7f3e62d068ac2c1', '192.168.9.33', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-94.64\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_2GjmHJVfeSsFA99kWpx4Zn', 'msf_daijb', 'ast_5410aac1859de1d9c7f3e62d068ac2c1', '192.168.9.33', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:35:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkcbkLPR3MYhY4w3UEt', 'msf_daijb', 'ast_55b3e96e65dd69a11728e56bbd7388a7', '192.168.3.110', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"4.4-27.45\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtvkZNMwTXURC3oDQCjS', 'msf_daijb', 'ast_55b3e96e65dd69a11728e56bbd7388a7', '192.168.3.110', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbc8EekSV72QmM1KmYHd2', 'msf_daijb', 'ast_5641a068ff6cb38f87a47baff3f26eb1', '192.168.7.27', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAYbyr4Rfygs2jNEYnkbi', 'msf_daijb', 'ast_57b92a9cdb95d2da74d5e222796acc0f', '192.168.3.127', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tacdtScQUhSRZt6ooSwZa', 'msf_daijb', 'ast_5d69971a0f69483333800629d9c665a7', '192.168.9.177', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws9oVig86vN6S7JePLa8wr', 'msf_daijb', 'ast_5d69971a0f69483333800629d9c665a7', '192.168.9.177', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUBNwiX3RhTmLPV1txjaQ', 'msf_daijb', 'ast_5fda2ffd01d92f29ca844cd9eef3a885', '192.168.9.147', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUg7sL1D44CyhHTWFLDAG', 'msf_daijb', 'ast_5fda2ffd01d92f29ca844cd9eef3a885', '192.168.9.147', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Hr6kFH1SVqNndCiU6chFZz', 'msf_daijb', 'ast_61b1256bca7fcab05504ed660871caa8', '192.168.122.13', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:00:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsE1knWZutBFVJ6fC8D6iL', 'msf_daijb', 'ast_647e601442c54f841288d1b9b8bdb9a5', '192.168.3.141', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"6.52-6.52\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsD2GSJRssmfW6dkgA7ket', 'msf_daijb', 'ast_647e601442c54f841288d1b9b8bdb9a5', '192.168.3.141', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtvatyo2EAHbJPx8HQSC', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-104.24\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVArYSuXJZuQpLxDy2VJG', 'msf_daijb', 'ast_67a0d18a4092638dccfa577320feb94d', '192.168.7.174', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtvqPZeQ5D4q8sikxbt4', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-86.52\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdrSeJt7MN9brgTUThJ', 'msf_daijb', 'ast_67d5e2d04425b62dcb5bc178835cf7d4', '192.168.8.244', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_TUTYhjdue745jAFXJbeNUg', 'msf_daijb', 'ast_6842b889a0b49cabcf43765044a38530', '192.168.9.113', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"6.39-6.39\"}]', '0', '0', '2021-03-27 10:55:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_2GmzmqEEpPgtsD2b57xbuz', 'msf_daijb', 'ast_6842b889a0b49cabcf43765044a38530', '192.168.9.113', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:35:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXLn88kei9zLf4caeba', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNYmrStZ6zwVakJwGrPJx', 'msf_daijb', 'ast_68cb1c714ec88413e062abee17a90d07', '192.168.3.92', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYPgFzDWn83qfhokNgUMe', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXeZAWLMSMdUcppfissDa', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-183.85\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZsXTcHWorUopZj7W7XcU', 'msf_daijb', 'ast_69a51ec4b895d2d3e02e1d05b9f8f7c7', '192.168.7.129', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRPHvXiU7ATL8UazZGGaGp', 'msf_daijb', 'ast_6a84f3436927a9240f141160517c70ff', '192.168.3.64', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws9Z8DTHNsst2itFBPcCac', 'msf_daijb', 'ast_6a84f3436927a9240f141160517c70ff', '192.168.3.64', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRPnJ3mxLrhdrjYcnn5UfA', 'msf_daijb', 'ast_6bd298c2394ea7be0db7c7ff078f07f8', '192.168.9.216', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.49-6.49\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNJQGPrYbu3VnP5onL3o6', 'msf_daijb', 'ast_6bd298c2394ea7be0db7c7ff078f07f8', '192.168.9.216', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Bth3fCXBov3cF1AVztvpzc', 'msf_daijb', 'ast_6f233f6c9dd58828361437b6c66d7f1e', '192.168.0.7', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_BtgZEWtJnnRMy4HUghtkxg', 'msf_daijb', 'ast_6f233f6c9dd58828361437b6c66d7f1e', '192.168.0.7', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsEkWomEH8Hxjtpbi7gjFN', 'msf_daijb', 'ast_6f6af28e94a7ec42fabc7cc931db8686', '192.168.9.161', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.42-6.42\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsMSUKziMJfUg4Cq7a4Gdv', 'msf_daijb', 'ast_6f6af28e94a7ec42fabc7cc931db8686', '192.168.9.161', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_BtgoFcXUzQBL1J7SiLzuur', 'msf_daijb', 'ast_71dce169bb9281fca54d52835c6c45d7', '192.168.9.85', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8ta7u8VWoma4Q2snAYCGGx', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-8863.73\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQhp4XJ99veWcUV5Aygc', 'msf_daijb', 'ast_725dbbdf9ea65c24ec78f693cdb20d64', '192.168.7.163', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_BtgoH2enpCdw6KBVQbVhSQ', 'msf_daijb', 'ast_74610982f20da87555861ccc2da4960c', '192.168.3.47', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkCSmv6LdPUyQTDFUVn', 'msf_daijb', 'ast_75b75b5e04111bbfe72797b4d57e24fa', '192.168.9.120', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.09-0.09\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVArxbswbeKNt55qgpV3N', 'msf_daijb', 'ast_77aed692ac257e3123eebdd1aff8d136', '192.168.8.171', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAnypPgHYvde4w58fzHZS', 'msf_daijb', 'ast_77aed692ac257e3123eebdd1aff8d136', '192.168.8.171', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVfby3ZPgckBeutFakMmr', 'msf_daijb', 'ast_79e04b1a14ddfed5b8665154df88e8a3', '192.168.9.211', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-8.44\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUg7nVovbSXPHLdahmp1e', 'msf_daijb', 'ast_79e04b1a14ddfed5b8665154df88e8a3', '192.168.9.211', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_5M73zd3Pv78DeX8EZVHDxU', 'msf_daijb', 'ast_7bad8c1bb435fd17771b85e2501fb13c', '192.168.8.187', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:50:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQhttiabmcEvZJQcjNqE', 'msf_daijb', 'ast_7bad8c1bb435fd17771b85e2501fb13c', '192.168.8.187', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-372.3\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdSHftb2wQ5sj4jgTxC', 'msf_daijb', 'ast_7bad8c1bb435fd17771b85e2501fb13c', '192.168.8.187', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVuy47RhS2Ycyc9qovJPz', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-622.2\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZd9nj4Dr8uDcFg4U2nwz', 'msf_daijb', 'ast_7d2ff76c2c96880a3e67064d22fb78ce', '192.168.9.131', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsHyKmpniUJxq2g1vdK7yA', 'msf_daijb', 'ast_7e9c608ca7ae2affb9e2e3f9d584e836', '192.168.9.12', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYPg6Kpwrtgeqp9uHZg4Q', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-335.11\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXRcKRDGPkQHUzA93kC', 'msf_daijb', 'ast_81a2c979e67c4a81e3d2547391e83e08', '192.168.7.184', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRTzjC9wVLxPhsicJQJjQk', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwX1TLzvBynLZMNSM416', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-346.73\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkSwMmUBgAiotDqvfwe', 'msf_daijb', 'ast_837fea1c9f64633c6210990294d26eed', '192.168.7.63', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYdgGps2Rt9AYF2mwXSNk', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.38-4.07\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUvV84G5ihNbqsNwZcx5e', 'msf_daijb', 'ast_83c8284f1a32382fbfcbc67bfcf79b6d', '192.168.3.36', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tY9JfwBWH29qsLactA8qn', 'msf_daijb', 'ast_8623fd4b8ea8f369edf9c3d22b20e227', '192.168.9.227', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-8.34\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXFwvrJ32ZaPq952FSx', 'msf_daijb', 'ast_8623fd4b8ea8f369edf9c3d22b20e227', '192.168.9.227', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDmPXnK3DY5s9WjkovMnx', 'msf_daijb', 'ast_8633968a2a2496369988aa374671a793', '192.168.9.222', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsBHhuhDcb8YvJNnPammf6', 'msf_daijb', 'ast_8898fc00e40eab50d4a5016279a831f3', '192.168.3.8', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"1.63-1.63\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtw13xDKJaFf2XZr5QBJ', 'msf_daijb', 'ast_8898fc00e40eab50d4a5016279a831f3', '192.168.3.8', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZdACt2e9DKBfyogBpnh6', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-150.54\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYPfqqF6V3dsbyg8etUcY', 'msf_daijb', 'ast_89f22902ea7d3c0879078f9acdb74206', '192.168.3.21', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8Qd4rnyottfUWfjFCwa4Xa', 'msf_daijb', 'ast_8aee343d85c9db21d03a584d436cc2a9', '192.168.9.223', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.36-6.36\"}]', '1', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNoA79UqH2JEgg9T7qv1n', 'msf_daijb', 'ast_8bd24a81ce2c1c93e1b7575caac9b784', '192.168.122.2', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"2.17-2.17\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsE1m7qM3idyrwsxtJShJp', 'msf_daijb', 'ast_8c5f4cba3c7202e6e38843599555ae7d', '192.168.0.9', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-15.62\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWXAZgVcL7AhJDusFrQhn', 'msf_daijb', 'ast_8c5f4cba3c7202e6e38843599555ae7d', '192.168.0.9', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtvvDkvrgtfF5heJX12g', 'msf_daijb', 'ast_8dbc512f5a4cb3ec161b7168a4ac2391', '192.168.8.134', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVuy8wcyteEDPYymMUhYc', 'msf_daijb', 'ast_8f9018eb841b52e6200be5b83330cb45', '192.168.9.2', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"1.45-1.45\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZ8RHGYUWrZyK5qBqTK7E', 'msf_daijb', 'ast_8f9018eb841b52e6200be5b83330cb45', '192.168.9.2', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUg7hfce8pqnsPofADQs2', 'msf_daijb', 'ast_918d60f34bb24b5d20530489f7339e26', '192.168.9.60', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"1.07-3.52\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tX9pKj3UGcZrfsg6v4nnL', 'msf_daijb', 'ast_927f74061d02f5924f5dad891508396f', '192.168.0.108', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.48\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws7pYGimHnnAMuZECZmS4G', 'msf_daijb', 'ast_927f74061d02f5924f5dad891508396f', '192.168.0.108', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_TUSZAJga77tEngp3dVtFvG', 'msf_daijb', 'ast_98e9010ce388eb3c38d78eace0f04457', '192.168.3.94', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-80876.32\"}]', '1', '0', '2021-03-27 10:55:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws8KH2frtVuYPSZYqq27Lt', 'msf_daijb', 'ast_98e9010ce388eb3c38d78eace0f04457', '192.168.3.94', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAYc9WSzbD43rd25duYtx', 'msf_daijb', 'ast_9a3cec6d8a287228ee389d885c359d44', '192.168.3.201', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVRE3fkFM47pCmMRuzRfW', 'msf_daijb', 'ast_9a659aa9d74e7c609e91d93a4efbcb06', '192.168.3.4', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"35.19-41.87\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMvUwQeKqem1okvZWaqmkc', 'msf_daijb', 'ast_9b8006acab8f6b2bfa4beb48714bf037', '192.168.9.58', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"5.9-5.9\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMuVPp2bjkMogTbRzPxrtx', 'msf_daijb', 'ast_9b8006acab8f6b2bfa4beb48714bf037', '192.168.9.58', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXbGhz8VkwEB8qFFr3S', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.34\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwWvd9iTaJBvcXStnerU', 'msf_daijb', 'ast_9bcf80f48b18680c7fdafc0f7d0efa59', '192.168.8.93', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXtw5t9VmvFr4yMVPdoKv', 'msf_daijb', 'ast_9bfeb71d7f154f1fe020436a86bba497', '192.168.8.146', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZsXHwtwtd7czg5GQzjKE', 'msf_daijb', 'ast_9bfeb71d7f154f1fe020436a86bba497', '192.168.8.146', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-74.56\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVArnwVNgQxC4BRzbhgk8', 'msf_daijb', 'ast_9bfeb71d7f154f1fe020436a86bba497', '192.168.8.146', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbLQr1y3rdHoV9YrMMcGp', 'msf_daijb', 'ast_9c507b23f79fa77c104671e6b4da447f', '192.168.9.155', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwX6HYHNofNkWBHyuT9i', 'msf_daijb', 'ast_9ebd8052359821f4797f19b8baa1e7d3', '192.168.7.249', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-1.5\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDmNwxx41EJiFtxJ11Zkc', 'msf_daijb', 'ast_9ebd8052359821f4797f19b8baa1e7d3', '192.168.7.249', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws94PHqoDFX8pMzGh3Eizk', 'msf_daijb', 'ast_a15b24f617b7d0e71a6e22a92bcc28a6', '192.168.3.172', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALPfsrZHPqY8uCfmSTz', 'msf_daijb', 'ast_a194bf6be591dd6d056fd81b22ec3545', '192.168.3.100', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.18-1.42\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRTFbmMHCAjEyB4KXaGXgC', 'msf_daijb', 'ast_a2128964f1cce94b3c31eae89b95f94e', '192.168.3.182', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-10.52\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_2GjmJdnnBniAekGyHXtSwi', 'msf_daijb', 'ast_a2128964f1cce94b3c31eae89b95f94e', '192.168.3.182', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:35:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRRWyjqu1cFTU36eU9TnSL', 'msf_daijb', 'ast_a94daa4062cb904a523b1b4617259c4e', '192.168.8.133', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-223.42\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRR2C9eBmJCsGTxESPDY6c', 'msf_daijb', 'ast_a94daa4062cb904a523b1b4617259c4e', '192.168.8.133', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbqDmWnqWWoVfRBepYEzU', 'msf_daijb', 'ast_a9b2320b2539ef4a667ba3e64f80a91f', '192.168.0.160', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdgnFjxszBKiCqNMfQ4', 'msf_daijb', 'ast_ae4bfa93c6e4bc46e970f84c32dfc6ff', '192.168.3.168', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-53.81\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTgdX7sB3eczVpYzHEs6p', 'msf_daijb', 'ast_ae4bfa93c6e4bc46e970f84c32dfc6ff', '192.168.3.168', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8Qc5eGedn59bFusL6McYi4', 'msf_daijb', 'ast_aebee5d8121d68b686fdfce8a45644fb', '192.168.9.73', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVAri7J6DoGbeEc549HbW', 'msf_daijb', 'ast_afb1d44ee125fc43b1d696d565b958aa', '192.168.7.25', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-1.78\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXkw6Z3j8844ngLNeLg', 'msf_daijb', 'ast_afb1d44ee125fc43b1d696d565b958aa', '192.168.7.25', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_BtgoGSqRpzL9wRZhwnauQ4', 'msf_daijb', 'ast_b13cde2e44c4c3f26f3680907d38cfea', '192.168.8.211', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws84umwc1qGNmHydQWjNRW', 'msf_daijb', 'ast_b13cde2e44c4c3f26f3680907d38cfea', '192.168.8.211', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-280.23\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws94PTWBnAkW1BsvY8MXHz', 'msf_daijb', 'ast_b13cde2e44c4c3f26f3680907d38cfea', '192.168.8.211', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWGo9HrAkEdtKkLarSsVA', 'msf_daijb', 'ast_b1ab4c3d359b2d0eb6c82c1923184722', '192.168.9.87', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.29-6.29\"}]', '0', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWXCeTMhoVEXcrZwrpPRJ', 'msf_daijb', 'ast_b1ab4c3d359b2d0eb6c82c1923184722', '192.168.9.87', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws94PdAaM5ysC1maPDUKbE', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXeZLAivMazfSiUWozfWp', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-135.36\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tZdA3De5Dywzr69q6hzPr', 'msf_daijb', 'ast_b50a17aaf89c5095c7a4dd5e59e6f778', '192.168.7.68', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMuzBQEJz4QPt2jr2AD7Eg', 'msf_daijb', 'ast_b527942c62084321341099b7301bab79', '192.168.9.159', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWf5Q7ZJeFpeJyhcZhKCU', 'msf_daijb', 'ast_b74517821bd209ea1903f287835c3e9f', '192.168.3.103', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-4.21\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_BtgZF1sUVY7TXXxSDyF9rQ', 'msf_daijb', 'ast_b74517821bd209ea1903f287835c3e9f', '192.168.3.103', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:30:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNYnSGFYKJieUN6Q5mBMJ', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSh9qZHQiAVkbvFrfciEL', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-77.25\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXvbV7xxVJsxSXRVSdv', 'msf_daijb', 'ast_b93cbe2b3a9490fe73088a877e1c025b', '192.168.7.8', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVfbU4PgvvedBEviKPxt8', 'msf_daijb', 'ast_b9aae38c7ba9a94ef26a789f8cc19a71', '192.168.9.100', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"8.77-10.11\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTw1cA4tJScYmrjf37bWQ', 'msf_daijb', 'ast_ba6322d22b14ce544cb68fce27706b63', '192.168.9.121', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUBNn48UWU6aWVqAoqwHA', 'msf_daijb', 'ast_ba6322d22b14ce544cb68fce27706b63', '192.168.9.121', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNYnwFRF4zpCx33wM7aF2', 'msf_daijb', 'ast_bb25209db54eb8a8a3190c3148faf957', '192.168.9.221', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tXeZQzvCpCgFrfJSMZ4fS', 'msf_daijb', 'ast_bbd86357071857a8c759b59d1390b310', '192.168.3.250', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMuVPZY1tNWkuDkxDmHfT6', 'msf_daijb', 'ast_bd074457aef10d66dda6fd536c00b4f1', '192.168.8.227', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTw12Lhu68qPtExCECoU4', 'msf_daijb', 'ast_bd074457aef10d66dda6fd536c00b4f1', '192.168.8.227', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-3.97\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws7pYMYxaFPqxKW487KqCt', 'msf_daijb', 'ast_bd074457aef10d66dda6fd536c00b4f1', '192.168.8.227', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_5M64mS4fXcgseThi4YrWwz', 'msf_daijb', 'ast_bdbd693e83cb3812fba1bbea5a1e0706', '192.168.9.80', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"3.83-3.83\"}]', '1', '0', '2021-03-27 10:50:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws84ucHDSv31aU5yZRca8G', 'msf_daijb', 'ast_bdbd693e83cb3812fba1bbea5a1e0706', '192.168.9.80', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVuyDmpGMFuooVogu36hE', 'msf_daijb', 'ast_bf6a3556070a2a4fd1387e568ec468f9', '192.168.3.98', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTSGGPcJP1TNMEdYxx8BS', 'msf_daijb', 'ast_bffe8fab9a913a8642f73ec4b654f007', '192.168.3.9', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.42-0.42\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvYW3BSZxr1WMZ9QWUFxyN', 'msf_daijb', 'ast_bffe8fab9a913a8642f73ec4b654f007', '192.168.3.9', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVfbtDN7E14bEy4L3BxdE', 'msf_daijb', 'ast_c0380136309f42bbd4cf0a3bfe5a176a', '192.168.3.50', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-1.07\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Hr2nGU3aY1HqbPnoLVq5oe', 'msf_daijb', 'ast_c2e2cd01bcd45f94da5cada897a17122', '192.168.9.79', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:00:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsE1mHVjcdsM3mmcjPZVc4', 'msf_daijb', 'ast_c49ee5a4d2fd16fe473c7c862433bb6f', '192.168.9.128', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMujmeaDbdJkTVo8tXAPrg', 'msf_daijb', 'ast_c98a3ee2a8b13d458c727c997406ca00', '192.168.9.42', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"6.55-6.55\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMwE4qSz8pzAYTarHQsyVA', 'msf_daijb', 'ast_c98a3ee2a8b13d458c727c997406ca00', '192.168.9.42', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8ta7u3fKXJxNocvxEzds8L', 'msf_daijb', 'ast_cab01f8d9876f44a7b0e340ac6e3420d', '192.168.3.20', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.57-2.26\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTSFw4qAYYizhTKrniXax', 'msf_daijb', 'ast_cab01f8d9876f44a7b0e340ac6e3420d', '192.168.3.20', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8taNGPDmgSDE2BThbrV1CL', 'msf_daijb', 'ast_cc3537da5fa9e83da62ce933e64992c6', '192.168.7.207', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-10.53\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDmNnJZV5zwXS1JSutmTN', 'msf_daijb', 'ast_cc3537da5fa9e83da62ce933e64992c6', '192.168.7.207', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRRWy5CLjwKzijY35nzbFN', 'msf_daijb', 'ast_cd4820a834efe371d20aa677fda7b925', '192.168.9.88', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"6.36-6.36\"}]', '1', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_MRNYn27H82EJgQdxnMyBcC', 'msf_daijb', 'ast_cd4820a834efe371d20aa677fda7b925', '192.168.9.88', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:25:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbqE6qZyLyXsKCVLzmqax', 'msf_daijb', 'ast_cf1447343b59243b2ccb6f6a9ffda9df', '192.168.9.235', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tURkN7AV1ZzaJs4JJNGo2', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-8930.97\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8taNGU3xxtpucbQXXQ3QLx', 'msf_daijb', 'ast_d33c24f0e9c10f0bae8d1adff29b7afa', '192.168.7.219', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDGdmrt312WifAW31xtit', 'msf_daijb', 'ast_e241d10b30ef32e558125b43c2299c17', '192.168.9.162', 'ICMP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvW2NyUnN24aVj5VqVcAN4', 'msf_daijb', 'ast_e241d10b30ef32e558125b43c2299c17', '192.168.9.162', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"6.42-6.42\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWuSuLQ2gk33hQ6pWfFZi', 'msf_daijb', 'ast_e4df9a4b99f1ded40e62b39f6b5a1244', '192.168.3.15', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-32.64\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws84uMndbYBxoEFVnnwNgQ', 'msf_daijb', 'ast_e5dcb9270a442f761f96a358188f30a1', '192.168.8.254', 'ICMP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwXg6uGb7SXe7xknpFC4', 'msf_daijb', 'ast_e6d915f4ee9084086bb4611f5a039213', '192.168.7.67', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-6.87\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWQiK3gztr2CzHS2LXNaL', 'msf_daijb', 'ast_e6d915f4ee9084086bb4611f5a039213', '192.168.7.67', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYdgXKSsojBwn5WYaCdpc', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-1.83\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTw1XKsbqpvxMuujVZCMn', 'msf_daijb', 'ast_e762504f737ca3657ae4e60275e32f2f', '192.168.7.222', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tbMkZmX9XPSpZ2xGjTYxY', 'msf_daijb', 'ast_ea4f7e9b6eb96f1e80f9764e06fbbbbd', '192.168.7.40', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-6.02\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDmP2o9LTqzJfqnDYZxuE', 'msf_daijb', 'ast_ea4f7e9b6eb96f1e80f9764e06fbbbbd', '192.168.7.40', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws8p237YLasyCDQMFiwz5N', 'msf_daijb', 'ast_eb329ca9d4b212823269f93473331189', '192.168.9.232', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_Ws9Jm3ZDnfrPzzF9fcsror', 'msf_daijb', 'ast_ee23d402bd1ec117a3c0a291e29be8d1', '192.168.9.44', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-4.47\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_QMuF1Pfctf75kXmwdTrXtt', 'msf_daijb', 'ast_ee23d402bd1ec117a3c0a291e29be8d1', '192.168.9.44', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:40:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsDX1CFXUau3Xde5KRNRwW', 'msf_daijb', 'ast_eeb610b0d926155910a68963c4ebd0de', '192.168.3.35', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8QbLRBLkBh62B8vrYXbCsJ', 'msf_daijb', 'ast_f16e8f39d85e8cfff08fae26122c4101', '192.168.9.148', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"4.27-4.34\"}]', '1', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8Qc5bgtbyr5Rs7ZiUVJB6p', 'msf_daijb', 'ast_f16e8f39d85e8cfff08fae26122c4101', '192.168.9.148', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 11:05:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tVRENzXPBWrBrYf86E2Fz', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-80.91\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_2GkG4osBcJJ9mJMLd3dukt', 'msf_daijb', 'ast_f2985f3da90686d46dfad51793f0ede4', '192.168.0.8', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:35:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTw1C16U1NCai8c3KKbmJ', 'msf_daijb', 'ast_f4629f7277dfba4a1139a62806625d6d', '192.168.7.253', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.11\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWma9gCRqySw1Gy9onKnY', 'msf_daijb', 'ast_f5455fe7913ee851bdbfa332fd42ffd3', '192.168.9.3', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.64-0.69\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsAYcKAqZWSREgWfvj2MCC', 'msf_daijb', 'ast_f5455fe7913ee851bdbfa332fd42ffd3', '192.168.9.3', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_TUTJKpG6VmVTMi6zUvtSNL', 'msf_daijb', 'ast_f567b9e1e9aa02d36334e490699a7ded', '192.168.3.85', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:55:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tSwWqnxRzxcbWfhXMEFhr', 'msf_daijb', 'ast_f657dcf7c520b3c56c4262ef5253b72d', '192.168.3.101', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-4.33\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tUvVNYqw6YRP5hriCJ9XW', 'msf_daijb', 'ast_f657dcf7c520b3c56c4262ef5253b72d', '192.168.3.101', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYt3cPKBZ8zP6mn8oNaSk', 'msf_daijb', 'ast_f9e2cbca9f59b0e24d3a5bce55fcb614', '192.168.8.59', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-211.09\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsCXXmBXZdFy4yaFxSRUWt', 'msf_daijb', 'ast_f9e2cbca9f59b0e24d3a5bce55fcb614', '192.168.8.59', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tTw17AuBYkWzJBn7mmCcg', 'msf_daijb', 'ast_fa4ee0e726e37f25fd949e9582fe3039', '192.168.9.167', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tYdgBzfjyGTa8JCrPy3E8', 'msf_daijb', 'ast_fa4ee0e726e37f25fd949e9582fe3039', '192.168.9.167', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tb7NttHrZfsELiuDhNpJ4', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'TCP',
+        '[{\"name\":\"11\",\"value\":\"0.0-51.7\"}]', '0', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_8tWALizezPk8DBvCtr134U', 'msf_daijb', 'ast_fad66ee08b7ca33e5ea722d1cc1f457d', '192.168.7.189', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:15:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_WsMgqfZAWRvKtcjaURuQhv', 'msf_daijb', 'ast_fb5e57f6bc29a365616eeec46f69156e', '192.168.9.17', 'UDP',
+        '[{\"name\":\"10\",\"value\":\"0.0-0.0\"}]', '1', '0', '2021-03-27 10:20:06');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvX1yKWvq4mKCebtpdvF8C', 'msf_daijb', 'ast_fcf1b84f5fea59e91ea8366a6389be2a', '192.168.8.141', 'TCP',
+        '[{\"name\":\"10\",\"value\":\"0.0-13818.35\"}]', '1', '0', '2021-03-27 10:45:07');
+INSERT INTO `model_result_asset_session_flow`
+VALUES ('msf_EvWmapKkhWtugJqaYAFWyW', 'msf_daijb', 'ast_fcf1b84f5fea59e91ea8366a6389be2a', '192.168.8.141', 'UDP',
+        '[{\"name\":\"11\",\"value\":\"0.0-0.0\"}]', '0', '0', '2021-03-27 10:45:07');

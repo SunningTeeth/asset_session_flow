@@ -47,8 +47,15 @@ import java.util.TimerTask;
  * @author daijb
  * @date 2021/3/8 16:27
  * 资产会话访问流量模型
+ * 参数设置参考如下:
+ * --mysql.servers 192.168.3.101
+ * --bootstrap.servers 192.168.3.101:6667
+ * --topic csp_flow //消费
+ * --check.topic csp_event // 建模结果发送的topic
+ * --group.id test
+ * --interval 1m
  */
-public class AssetSessionVisitFlow implements AssetBehaviorConstants {
+public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetSessionVisitFlow.class);
 
@@ -60,7 +67,13 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
 
     public void run(String[] args) {
         logger.info("flink streaming is starting....");
-
+        StringBuilder text = new StringBuilder(128);
+        for (String s : args) {
+            text.append(s).append("\t");
+        }
+        logger.info("all params : " + text.toString());
+        Properties properties = JavaKafkaConfigurer.getKafkaProperties(args);
+        System.setProperty("mysql.servers", properties.getProperty("mysql.servers"));
         // 启动定时任务
         startFunc();
 
@@ -77,10 +90,9 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
         StreamTableEnvironment streamTableEnvironment = StreamTableEnvironment.create(streamExecutionEnvironment, fsSettings);
 
         //加载kafka配置信息
-        Properties kafkaProperties = JavaKafkaConfigurer.getKafkaProperties(args);
-        logger.info("load kafka properties : " + kafkaProperties.toString());
+        logger.info("load kafka properties : " + properties.toString());
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getProperty("bootstrap.servers"));
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getProperty("bootstrap.servers"));
         //可根据实际拉取数据等设置此值，默认30s
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000);
         //每次poll的最大数量
@@ -88,15 +100,23 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 30);
         //当前消费实例所属的消费组
         //属于同一个组的消费实例，会负载消费消息
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getProperty("group.id"));
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getProperty("group.id"));
+
+        int intervalOriginal = ConversionUtil.str2Minutes(ConversionUtil.toString(properties.get("interval")));
 
         // 添加kafka source
         // 过滤kafka无匹配资产的数据
-        DataStream<String> kafkaSource = streamExecutionEnvironment.addSource(new FlinkKafkaConsumer010<>(kafkaProperties.getProperty("topic"), new SimpleStringSchema(), props));
+        DataStream<String> kafkaSource = streamExecutionEnvironment.addSource(new FlinkKafkaConsumer010<>(properties.getProperty("topic"), new SimpleStringSchema(), props));
 
         DataStream<String> kafkaSourceFilter = kafkaSource.filter((FilterFunction<String>) value -> {
             JSONObject line = (JSONObject) JSONValue.parse(value);
-            return !StringUtil.isEmpty(ConversionUtil.toString(line.get("SrcID")));
+            if (!StringUtil.isEmpty(ConversionUtil.toString(line.get("SrcID")))) {
+                return true;
+            }
+            if (StringUtil.isEmpty(ConversionUtil.toString(line.get("DstID")))) {
+                return false;
+            }
+            return false;
         });
 
         // 添加需要匹配的字段
@@ -138,18 +158,17 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
             streamTableEnvironment.registerFunction("UDFTimestampConverter", new UDFTimestampConverter());
 
             // 运行sql
-            //String intervalTime = "'1' DAY";
-            String intervalTime = "'1' MINUTE";
+            String intervalTime1 = "'" + intervalOriginal + "' MINUTE";
             // 第一个算子计算样本总量(求样本均值)
             String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(inFlow) as flowSize,count(1) as totalCount," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                     "from kafka_asset_in_flow " +
-                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
+                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
 
             String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(outFlow) as flowSize,count(1) as totalCount," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                     "from kafka_asset_out_flow " +
-                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime + ")";
+                    "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
 
             // 获取结果
             Table inFlowTable = streamTableEnvironment.sqlQuery(inFlowSql);
@@ -164,19 +183,20 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
             streamTableEnvironment.createTemporaryView("calculate_out_flow", outFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
 
             // 第二个算子计算样本方差
+            String intervalTime2 = "'" + intervalOriginal * 5 + "' MINUTE";
             String inFlowCalculate = "select srcId,srcIp,areaId,protocol," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '5' MINUTE),'YYYY-MM-dd','+08:00') as cDate," +
+                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
                     "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
                     "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
                     " from calculate_in_flow " +
-                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL '5' MINUTE)";
+                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
 
             String outFlowCalculate = "select srcId,srcIp,areaId,protocol," +
-                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL '5' MINUTE),'YYYY-MM-dd','+08:00') as cDate," +
+                    "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
                     "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
                     "((sum(flowSize)/sum(totalCount))-1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as minFlowSize " +
                     " from calculate_in_flow " +
-                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL '5' MINUTE)";
+                    " group by srcId,srcIp,areaId,protocol,TUMBLE(rowtime, INTERVAL " + intervalTime2 + ")";
 
             Table inFlowCalculateTable = streamTableEnvironment.sqlQuery(inFlowCalculate);
             Table outFlowCalculateTable = streamTableEnvironment.sqlQuery(outFlowCalculate);
@@ -197,15 +217,31 @@ public class AssetSessionVisitFlow implements AssetBehaviorConstants {
                         return json;
                     });
 
-            inFlowStaticStream.print().setParallelism(1);
-            //outFlowStaticStream.print().setParallelism(1);
-
             // sink
-            //inFlowStaticStream.addSink(new SessionFlowSink());
-            //outFlowStaticStream.addSink(new SessionFlowSink());
+            inFlowStaticStream.addSink(new SessionFlowSink());
+            outFlowStaticStream.addSink(new SessionFlowSink());
 
         }
 
+        // 检测系列操作
+        {
+            /*SingleOutputStreamOperator<String> checkStreamMap = kafkaSourceFilter.map(new CheckModelMapSourceFunction());
+            SingleOutputStreamOperator<String> matchCheckStreamFilter = checkStreamMap.filter((FilterFunction<String>) value -> {
+                if (StringUtil.isEmpty(value)) {
+                    return false;
+                }
+                return true;
+            });
+
+            // 将过滤数据送往kafka  topic
+            String brokers = ConversionUtil.toString(props.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+            String checkTopic = ConversionUtil.toString(props.getProperty("check.topic"));
+            matchCheckStreamFilter.addSink(new FlinkKafkaProducer010<>(
+                    brokers,
+                    checkTopic,
+                    new KeyedSerializationSchemaWrapper<>(new SimpleStringSchema())
+            ));*/
+        }
         try {
             streamExecutionEnvironment.execute("kafka message streaming start ....");
         } catch (Exception e) {
