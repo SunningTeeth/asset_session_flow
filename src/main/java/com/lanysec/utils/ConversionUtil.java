@@ -100,21 +100,41 @@ public class ConversionUtil {
         }
     }
 
-    public static int str2Minutes(String str) {
+    public static String str2Format(String str) {
         if (StringUtil.isEmpty(str)) {
-            return 5;
+            return "'5' MINUTE ";
         }
         str = str.toLowerCase().trim();
         if (str.endsWith("m")) {
             str = str.substring(0, str.length() - 1);
-            return toInt(str);
+            return "'" + str + "' MINUTE ";
         } else if (str.endsWith("h")) {
             str = str.substring(0, str.length() - 1);
-            return toInt(str) * 60;
+            return "'" + str + "' HOUR ";
         } else {
             //day
             str = str.substring(0, str.length() - 1);
-            return toInt(str) * 60 * 24;
+            return "'" + str + "' DAY";
+        }
+    }
+
+    public static String str2Format2(String str) {
+        if (StringUtil.isEmpty(str)) {
+            return "'10' MINUTE ";
+        }
+        str = str.toLowerCase().trim();
+        if (str.endsWith("m")) {
+            str = str.substring(0, str.length() - 1);
+            int c = toInt(str);
+            return "'" + c * 5 + "' MINUTE ";
+        } else if (str.endsWith("h")) {
+            str = str.substring(0, str.length() - 1);
+            int c = toInt(str);
+            return "'" + c * 2 + "' HOUR ";
+        } else {
+            //day
+            str = str.substring(0, str.length() - 1);
+            return "'" + str + "' DAY";
         }
     }
 }

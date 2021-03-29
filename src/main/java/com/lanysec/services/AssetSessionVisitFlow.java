@@ -102,7 +102,7 @@ public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
         //属于同一个组的消费实例，会负载消费消息
         props.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getProperty("group.id"));
 
-        int intervalOriginal = ConversionUtil.str2Minutes(ConversionUtil.toString(properties.get("interval")));
+        String intervalOriginal = ConversionUtil.str2Format(ConversionUtil.toString(properties.get("interval")));
 
         // 添加kafka source
         // 过滤kafka无匹配资产的数据
@@ -158,17 +158,16 @@ public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
         streamTableEnvironment.registerFunction("UDFTimestampConverter", new UDFTimestampConverter());
 
         // 运行sql
-        String intervalTime1 = "'" + intervalOriginal + "' MINUTE";
         // 第一个算子计算样本总量(求样本均值)
         String inFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(inFlow) as flowSize,count(1) as totalCount," +
-                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalOriginal + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                 "from kafka_asset_in_flow " +
-                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
+                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalOriginal + ")";
 
         String outFlowSql = "select srcIp,srcId,areaId,l4p as protocol,sum(outFlow) as flowSize,count(1) as totalCount," +
-                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime1 + " ),'YYYY-MM-dd','+08:00') as cntDate " +
+                "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalOriginal + " ),'YYYY-MM-dd','+08:00') as cntDate " +
                 "from kafka_asset_out_flow " +
-                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalTime1 + ")";
+                "group by areaId,srcId,srcIp,l4p,TUMBLE(rowtime, INTERVAL " + intervalOriginal + ")";
 
         // 获取结果
         Table inFlowTable = streamTableEnvironment.sqlQuery(inFlowSql);
@@ -183,7 +182,8 @@ public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
         streamTableEnvironment.createTemporaryView("calculate_out_flow", outFlowSinkEntityDataStream, "srcId,srcIp,protocol,areaId,flowSize,totalCount,rowtime.rowtime");
 
         // 第二个算子计算样本方差
-        String intervalTime2 = "'" + intervalOriginal * 5 + "' MINUTE";
+        String intervalTime2 = ConversionUtil.str2Format2(ConversionUtil.toString(properties.get("interval")));
+
         String inFlowCalculate = "select srcId,srcIp,areaId,protocol," +
                 "UDFTimestampConverter(TUMBLE_END(rowtime, INTERVAL " + intervalTime2 + "),'YYYY-MM-dd','+08:00') as cDate," +
                 "((sum(flowSize)/sum(totalCount))+1.96*STDDEV_POP(flowSize)/SQRT(sum(totalCount))) as maxFlowSize," +
@@ -241,7 +241,7 @@ public class AssetSessionVisitFlow implements AssetSessionVisitConstants {
         String updateSql = "UPDATE `modeling_params` SET `model_task_status`=?, `modify_time`=? " +
                 " WHERE (`id`='" + modelId + "');";
         DbConnectUtil.execUpdateTask(updateSql, modelStatus.toString().toLowerCase(), LocalDateTime.now().toString());
-        logger.info("[kafkaMessageStreaming] update model task status : " + modelStatus.name());
+        logger.info("[AssetSessionVisitFlow] update model task status : " + modelStatus.name());
     }
 
     private void startFunc() {
