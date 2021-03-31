@@ -31,10 +31,9 @@ public class AssetMapSourceFunction extends RichMapFunction<String, String> {
                 "and m.model_type=1 and model_child_type=1 " +
                 "and model_switch=1 and model_switch_2=1;";*/
         String sql = "SELECT entity_id FROM group_members g,modeling_params m " +
-                "WHERE g.group_id=m.model_alt_params -> '$.model_entity_group' " +
+                "WHERE m.model_alt_params -> '$.model_entity_group' LIKE CONCAT('%', g.group_id,'%') " +
                 "and m.model_type=1 and model_child_type=1 " +
                 "and m.model_switch=1 and m.model_switch_2=1";
-
         ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
         while (resultSet.next()) {
             String entityId = ConversionUtil.toString(resultSet.getString("entity_id"));
