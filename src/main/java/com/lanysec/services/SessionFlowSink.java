@@ -148,6 +148,7 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         ps.addBatch();
         batchSize.incrementAndGet();
         if (batchSize.get() > MAX_BATCH_SIZE) {
+            logger.info("操作了" + batchSize.get() + "条记录");
             ps.executeBatch();
             batchSize.set(0);
         }

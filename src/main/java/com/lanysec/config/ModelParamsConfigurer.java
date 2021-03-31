@@ -11,10 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author daijb
@@ -23,6 +20,8 @@ import java.util.Map;
 public class ModelParamsConfigurer implements AssetSessionVisitConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelParamsConfigurer.class);
+
+    private static final Connection connection = DbConnectUtil.getConnection();
 
     private static volatile Map<String, Object> modelingParams;
 
@@ -42,7 +41,6 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
      * 从数据库获取建模参数
      */
     public static Map<String, Object> reloadModelingParams() {
-        Connection connection = DbConnectUtil.getConnection();
         Map<String, Object> result = new HashMap<>(15 * 3 / 4);
         try {
             String sql = "select * from modeling_params" +
@@ -72,6 +70,37 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
         }
         logger.info("Get modeling parameters from the database : " + result.toString());
         return result;
+    }
+
+    private static volatile Set<String> allAssetIds;
+
+    /**
+     * 返回建模的资产id
+     *
+     * @return 建模参数k-v
+     */
+    public static Set<String> getAllAssetIds() throws Exception {
+        if (allAssetIds == null) {
+            allAssetIds = reloadBuildModelAssetId();
+        }
+        return allAssetIds;
+    }
+
+    /**
+     * 返回目标资产id
+     */
+    public static Set<String> reloadBuildModelAssetId() throws SQLException {
+        String sql = "SELECT entity_id FROM group_members g,modeling_params m " +
+                "WHERE m.model_alt_params -> '$.model_entity_group' LIKE CONCAT('%', g.group_id,'%') " +
+                "and m.model_type=1 and model_child_type=1 " +
+                "and m.model_switch=1 and m.model_switch_2=1";
+        Set<String> allAssetIds = new HashSet<>();
+        ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
+        while (resultSet.next()) {
+            String entityId = ConversionUtil.toString(resultSet.getString("entity_id"));
+            allAssetIds.add(entityId);
+        }
+        return allAssetIds;
     }
 
     private static volatile List<Map<String, Object>> lastBuildModelResult;
