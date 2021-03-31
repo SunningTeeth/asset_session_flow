@@ -21,8 +21,6 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelParamsConfigurer.class);
 
-    private static final Connection connection = DbConnectUtil.getConnection();
-
     private static volatile Map<String, Object> modelingParams;
 
     /**
@@ -43,6 +41,10 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
     public static Map<String, Object> reloadModelingParams() {
         Map<String, Object> result = new HashMap<>(15 * 3 / 4);
         try {
+            Connection connection = DbConnectUtil.getConnection();
+            if (connection == null) {
+                return result;
+            }
             String sql = "select * from modeling_params" +
                     " where model_type=1 and model_child_type =1" +
                     " and model_switch = 1 and model_switch_2 =1";
@@ -95,10 +97,13 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
                 "and m.model_type=1 and model_child_type=1 " +
                 "and m.model_switch=1 and m.model_switch_2=1";
         Set<String> allAssetIds = new HashSet<>();
-        ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
-        while (resultSet.next()) {
-            String entityId = ConversionUtil.toString(resultSet.getString("entity_id"));
-            allAssetIds.add(entityId);
+        Connection connection = DbConnectUtil.getConnection();
+        if (connection != null) {
+            ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
+            while (resultSet.next()) {
+                String entityId = ConversionUtil.toString(resultSet.getString("entity_id"));
+                allAssetIds.add(entityId);
+            }
         }
         return allAssetIds;
     }
@@ -122,7 +127,11 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
         String querySql = "select src_id,flow,protocol from model_result_asset_session_flow " +
                 "where modeling_params_id='" + modelId + "';";
         try {
-            ResultSet resultSet = DbConnectUtil.getConnection().createStatement().executeQuery(querySql);
+            Connection connection = DbConnectUtil.getConnection();
+            if (connection == null) {
+                return;
+            }
+            ResultSet resultSet = connection.createStatement().executeQuery(querySql);
             while (resultSet.next()) {
                 Map<String, Object> map = new HashMap<>();
                 String srcId = resultSet.getString("src_id");

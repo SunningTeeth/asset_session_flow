@@ -50,10 +50,6 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
 
     private volatile boolean isFirst = true;
 
-    private final AtomicInteger batchSize = new AtomicInteger();
-
-    private final int MAX_BATCH_SIZE = 200;
-
     /**
      * 记录历史数据天数
      */
@@ -145,14 +141,7 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
         ps.setInt(8, SystemUtil.isInternalIp(srcIp));
         ps.setString(9, LocalDateTime.now().toString());
         ps.setString(10, segment.toJSONString());
-        ps.addBatch();
-        batchSize.incrementAndGet();
-        if (batchSize.get() > MAX_BATCH_SIZE) {
-            logger.info("操作了" + batchSize.get() + "条记录");
-            ps.executeBatch();
-            batchSize.set(0);
-        }
-
+        ps.execute();
         if (isFirst) {
             isFirst = false;
             //updateModelTaskStatus(AssetBehaviorConstants.ModelStatus.SUCCESS);
