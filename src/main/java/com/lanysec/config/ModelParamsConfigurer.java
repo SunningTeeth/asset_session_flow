@@ -71,6 +71,7 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
             logger.error("Get modeling parameters from the database error ", throwable);
         }
         logger.info("Get modeling parameters from the database : " + result.toString());
+        modelingParams = result;
         return result;
     }
 
@@ -96,16 +97,17 @@ public class ModelParamsConfigurer implements AssetSessionVisitConstants {
                 "WHERE m.model_alt_params -> '$.model_entity_group' LIKE CONCAT('%', g.group_id,'%') " +
                 "and m.model_type=1 and model_child_type=1 " +
                 "and m.model_switch=1 and m.model_switch_2=1";
-        Set<String> allAssetIds = new HashSet<>();
+        Set<String> result = new HashSet<>();
         Connection connection = DbConnectUtil.getConnection();
         if (connection != null) {
             ResultSet resultSet = connection.prepareStatement(sql).executeQuery();
             while (resultSet.next()) {
                 String entityId = ConversionUtil.toString(resultSet.getString("entity_id"));
-                allAssetIds.add(entityId);
+                result.add(entityId);
             }
         }
-        return allAssetIds;
+        allAssetIds = result;
+        return result;
     }
 
     private static volatile List<Map<String, Object>> lastBuildModelResult;
