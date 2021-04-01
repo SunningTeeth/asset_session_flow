@@ -107,7 +107,6 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
                 }
             }
         }
-        JSONObject json = new JSONObject();
         double minFlowSize = ConversionUtil.toDouble(value.get("minFlowSize"));
         if (minFlowSize < 0) {
             minFlowSize = 0;
@@ -115,16 +114,23 @@ public class SessionFlowSink extends RichSinkFunction<JSONObject> {
             minFlowSize = ConversionUtil.toDouble((minFlowSize / 1024));
         }
         String calculateValue = minFlowSize + "-" + ConversionUtil.toDouble((ConversionUtil.toDouble(value.get("maxFlowSize")) / 1024));
+        JSONObject json = new JSONObject();
         json.put("name", key);
         json.put("value", calculateValue);
         if (segment != null) {
-            for (Object o : segment) {
-                JSONObject obj = (JSONObject) o;
+            boolean hasKey = false;
+            for (int i = 0; i < segment.size(); i++) {
+                JSONObject obj = (JSONObject) segment.get(i);
                 String name = ConversionUtil.toString(obj.get("name"));
                 if (StringUtil.equals(name, key)) {
                     obj.put("value", calculateValue);
+                    segment.set(i, obj);
+                    hasKey = true;
                     break;
                 }
+            }
+            if (!hasKey) {
+                segment.add(json);
             }
         } else {
             segment = new JSONArray();
